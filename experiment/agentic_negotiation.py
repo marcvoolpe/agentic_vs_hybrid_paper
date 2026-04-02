@@ -26,7 +26,10 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         self.role = player.opposite_role
 
         # Async functions loose self.player, copy what is needed
-        self._pending_offer = None
+        self._pending_offer1 = None
+        self._pending_offer2 = None
+        self._pending_offer3 = None
+
         self.config = copy.deepcopy(player.session.config)
         self.config.update({
             'idx': player.id_in_group,
@@ -63,7 +66,6 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         self.user_message = HYBRID_PROMPTS['offer_string'] % (price, quantity)
         self._offers_interactions()
         asyncio.ensure_future(self.start_task(self._run_offer))
-
 
     async def _run_initial(self):
         await self._run_loop("Start the negotiation with an opening message.")
@@ -212,29 +214,40 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         log_function(__class__, sys._getframe().f_code.co_name)
         arguments = json.loads(arguments)
 
-        price = arguments.get('price')
-        quantity = arguments.get('quantity')
+        evaluations = []
 
-        self._pending_offer = Offer(price=price, quantity=quantity)
+        for i in range(1,4):
+            price = arguments.get(f'price_{i}')
+            quantity = arguments.get(f'quantity_{i}')
+            pending_offer = Offer(price=price, quantity=quantity)
+            setattr(self, f'_pending_offer{i}', pending_offer)
+            
+            evaluation = numeric_offer_evaluation(
+                price, quantity, self.role,
+                self.constraint_user, self.constraint_bot)
+            
+            evaluations.append(evaluation)
 
-        evaluation = numeric_offer_evaluation(
-            price, quantity, self.role,
-            self.constraint_user, self.constraint_bot)
+        output = "\n".join(f'Proposed Offer {i+1} evaluation: {evaluations[i]}' for i in range(3))
 
-        return evaluation
+        return output
 
     async def _handle_send_offer(self, arguments: str) -> None:
         """Send the pending offer to the interface."""
         log_function(__class__, sys._getframe().f_code.co_name)
         arguments = json.loads(arguments)
 
-        if self._pending_offer is None:
+        offer_number = arguments.get('offer_number')
+
+        if getattr(self, f'_pending_offer{offer_number}') is None:
             self.store_send_data(llm_output="I need a moment to think.")
             return
 
-        self.offer_list.append(self._pending_offer)
+        self.offer_list.append(getattr(self, f'_pending_offer{offer_number}'))
         self.store_send_data()
-        self._pending_offer = None
+
+        for i in range(1,4):
+            setattr(self, f'_pending_offer{i}', None)
 
     async def _handle_accept_offer(self, arguments: str) -> None:
         log_function(__class__, sys._getframe().f_code.co_name)

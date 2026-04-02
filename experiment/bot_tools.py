@@ -28,23 +28,39 @@ TOOLS = [
     "type": "function",
     "function": {
         "name": "propose_offer",
-        "description": "Draft an offer and evaluate its profitability BEFORE sending it. "
-                    "Returns your profit, the human's profit, target_profit, and surplus. "
+        "description": "Draft three offers and evaluate their profitability BEFORE sending any. "
+                    "For each offer, returns your profit, the human's profit, target_profit, and surplus. "
                     "If surplus >= 0 the offer meets your target. "
-                    "This does NOT send the offer yet — call send_offer to send it.",
+                    "This does NOT send any offer yet — call send_offer with the offer number to send it.",
         "parameters": {
             "type": "object",
             "properties": {
-                "price": {
+                "price_1": {
                     "type": "number",
-                    "description": "The price of the offer"
+                    "description": "The price of the first offer"
                 },
-                "quantity": {
+                "quantity_1": {
                     "type": "integer",
-                    "description": "The quantity of the offer"
+                    "description": "The quantity of the first offer"
+                },
+                "price_2": {
+                    "type": "number",
+                    "description": "The price of the second offer"
+                },
+                "quantity_2": {
+                    "type": "integer",
+                    "description": "The quantity of the second offer"
+                },
+                "price_3": {
+                    "type": "number",
+                    "description": "The price of the third offer"
+                },
+                "quantity_3": {
+                    "type": "integer",
+                    "description": "The quantity of the third offer"
                 }
             },
-            "required": ["price", "quantity"]
+            "required": ["price_1", "quantity_1", "price_2", "quantity_2", "price_3", "quantity_3"]
         }
     }
 },
@@ -52,13 +68,18 @@ TOOLS = [
     "type": "function",
     "function": {
         "name": "send_offer",
-        "description": "Send the last proposed offer to the human negotiator. "
-                    "Call this only after calling propose_offer and the pending offer meets your target. "
-                    "NEVER use this tool if the last offer evaluation yields negaive surplus."
+        "description": "Send the chosen proposed offer to the human negotiator. "
+                    "Call this only after calling propose_offer and the chosen pending offer meets your target. "
+                    "NEVER use this tool if the chosen offer evaluation yields negaive surplus."
                     "Once sent, the negotiator can officially accept or counter. ",
         "parameters": {
             "type": "object",
-            "properties": {}
+            "properties": {
+                "offer_number": {
+                    "type": "integer",
+                    "description": "the offer number (1 or 2 or 3) of the proposed offer you want to send to your counterpart."
+                } 
+            }
         }
     }
 },

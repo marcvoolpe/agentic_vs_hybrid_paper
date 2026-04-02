@@ -68,7 +68,7 @@ TOOLS = [
     "type": "function",
     "function": {
         "name": "send_offer",
-        "description": "Send the chosen proposed offer to the human negotiator. "
+        "description": "Send the chosen proposed offer to the human negotiator via the interface and the chat. "
                     "Call this only after calling propose_offer and the chosen pending offer meets your target. "
                     "NEVER use this tool if the chosen offer evaluation yields negaive surplus."
                     "Once sent, the negotiator can officially accept or counter. ",
@@ -78,8 +78,13 @@ TOOLS = [
                 "offer_number": {
                     "type": "integer",
                     "description": "the offer number (1 or 2 or 3) of the proposed offer you want to send to your counterpart."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "message that contains the terms of the offer along with a brief explanation based on the context."
                 } 
-            }
+            },
+            "required": ["offer_number", "messaage"]
         }
     }
 },
@@ -124,6 +129,32 @@ TOOLS = [
             },
             "required": []  #if passed, the llm is evaluating its offer to send, otherwise it's received
             # TODO: what happens if the human sends offer in the chat but the llm does not pass the argumentss
+        }
+    }
+},
+{
+    "type": "function",
+    "function": {
+        "name": "evaluate_single",
+        "description": "Evaluate if a single term can lead to a profitable offer or no. "
+                       "Call this when you receive an offer with a single term - always. "
+                       "If no price is provided in the chat, evaluates feasibility of quantity, and viceversa "
+                       "Returns True if it's possible to reach a profitable offer by fixing this term. "
+                       "If False, there is no feasible offer that maintains this term"
+                       "A profitable offer always has surplus >= 0",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "type": "number",
+                    "description": "Price to evaluate."
+                },
+                "quantity": {
+                    "type": "integer",
+                    "description": "Quantity to evaluate."
+                }
+            },
+            "required": []
         }
     }
 },

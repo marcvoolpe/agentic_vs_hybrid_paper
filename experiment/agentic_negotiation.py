@@ -172,6 +172,7 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             "accept_offer": self._handle_accept_offer,
             "evaluate_offer": self._handle_evaluate_offer,
             "compute_nash": self._handle_compute_nash,
+            "evaluate_single": self._handle_evaluate_single
         }
 
         if tool_name not in table:
@@ -196,6 +197,28 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
 
         return numeric_offer_evaluation(price, quantity, self.role,
                                         self.constraint_user, self.constraint_bot)
+    
+    async def _handle_evaluate_single(self, arguments: str) -> dict:
+        log_function(__class__, sys._getframe().f_code.co_name)
+        arguments = json.loads(arguments)
+
+        price = arguments.get('price')
+        quantity = arguments.get('quantity')
+        offer = Offer(price=price, quantity=quantity)
+
+        # TODO: refactor from offer.py
+        params = {
+            'bot_is_supplier': self.bot_is_supplier,
+            'nash_profit': nash_bargaining_solution(
+                self.constraint_user, self.constraint_bot)['profit'],
+            'production_cost': min([self.constraint_user, self.constraint_bot]),
+            'market_price': max([self.constraint_user, self.constraint_bot]),
+        }
+
+        if price is None:
+            return {f'Is quantity {quantity} feasible?': offer._is_quantity_feasible(params=params)}
+        else: 
+            return {f'Is price {price} feasible?': offer._is_price_feasible(params=params)}
     
     async def _handle_compute_nash(self, arguments: str) -> dict: # arguments is always empty here
         log_function(__class__, sys._getframe().f_code.co_name)
@@ -238,6 +261,7 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         arguments = json.loads(arguments)
 
         offer_number = arguments.get('offer_number')
+        message = arguments.get('message')
 
         if getattr(self, f'_pending_offer{offer_number}') is None:
             self.store_send_data(llm_output="I need a moment to think.")

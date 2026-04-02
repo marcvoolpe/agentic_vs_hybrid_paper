@@ -1,0 +1,299 @@
+{% block title %}
+  Instructions - {{ player.clean_role }}
+{% endblock %}
+
+{% block styles %}
+  <style>
+    .pc-divider {
+      border-right: 4px double #000 !important;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Welcome to the Delegation Experiment</h4>
+      <p><strong>Your role: {{ player.clean_role }} Manager </strong></p>
+      <hr>
+
+      <h5>Overview</h5>
+      <p>
+        You will be assigned to manage a
+        <strong>{{ player.clean_role }}</strong> company.
+      </p>
+      <p>
+        Your only task is to delegate one negotiation to either a
+        <strong>{{ agent_1 }}</strong> or an <strong>{{ agent_2 }}</strong>.
+      </p>
+
+      <h5>Key Information</h5>
+      <ul>
+        <li>
+          The expected negotiation performance of the {{ agent_1 }} and
+          the {{ agent_2 }} is <strong>equal</strong>.
+        </li>
+        <li>
+          {{ agent_1 }} negotiators are augmented with the same optimal offers
+          as the {{ agent_2 }}.
+        </li>
+        <li>
+          <strong>Base Delegation Costs:</strong>
+          <ul>
+            <li>Delegating to a {{ agent_1 }} costs <strong>20€</strong>.</li>
+            <li>Delegating to the {{ agent_2 }} costs <strong>10€</strong>.</li>
+          </ul>
+        </li>
+        <li>
+          Each participant will be assigned one of three product classes
+          (<strong>A</strong>, <strong>B</strong>, or <strong>C</strong>), which
+          determines the Transaction Cost (TC).
+        </li>
+        <li>
+          TC has a <strong>50% probability of being halved</strong> if both
+          parties delegate to {{ agent_1 }}s.
+        </li>
+        <li>
+          There is <strong>one upcoming negotiation</strong>, thus one
+          delegation decision on behalf of your organization.
+        </li>
+        <li>
+          The negotiation will be conducted <strong>right after</strong> both
+          parties make their delegation decision.
+        </li>
+      </ul>
+
+      <h5>Negotiation Context</h5>
+      <p>
+        Negotiations will be held after the delegation decision. Retailers and
+        Suppliers negotiate via text on the
+        <strong>wholesale price &amp; quantity</strong> of Pellet bags.
+      </p>
+      <ul>
+        <li>
+          The item is produced by the supplying company at a <strong>Production
+          Cost (PC)</strong> of <strong>3, 4, or 5</strong>.
+        </li>
+        <li>
+          This item is sold by the retailer company at a <strong>Retail Price
+          (RP)</strong> of <strong>11</strong>.
+        </li>
+        <li>
+          PC and RP are <strong>common knowledge</strong> and are randomly drawn
+          with equal probability.
+        </li>
+        <li>
+          Demand will be randomly drawn as <strong>0 or 100</strong> with equal
+          probability right after the negotiation.
+        </li>
+        <li>
+          Suppliers carry the risk of unsold inventory (any quantity &gt; demand
+          will expire).
+        </li>
+      </ul>
+
+      <h5>Your Choice</h5>
+      <p>
+        {% if player.role == C.ROLE_RETAILER_MANAGER %}
+          <strong>You are the first mover</strong>; you don't know the choice of
+          the counterpart before making your choice.
+        {% else %}
+          You will see the <strong>Retailer's choice</strong> before making your
+          decision.
+        {% endif %}
+      </p>
+      <ul>
+        <li>
+          Choosing the <strong>{{ agent_2 }}</strong> signals a focus on
+          extracting transactional value.
+        </li>
+        <li>
+          Choosing a <strong>{{ agent_1 }}</strong> signals an intent to build a
+          relationship.
+        </li>
+        <li>
+          If both parties delegate to {{ agent_1 }}s, there is a <strong>50%
+          chance of building a relationship</strong>.
+        </li>
+        <li>
+          This relationship grants a <strong>huge reduction in Transaction
+          Costs</strong> (reduced by half).
+        </li>
+        <li>
+          This potential cut in TC arises from the relationship of trust built
+          through {{ contact }} contact.
+        </li>
+      </ul>
+
+      <h5>Cost Structure Table</h5>
+      <p>
+        The table below guides you in the decision to delegate to
+        a {{ agent_1 }} or an {{ agent_2 }}.
+      </p>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm align-middle text-center">
+          <thead class="table-light">
+          <tr>
+            <th rowspan="2" scope="col">Class</th>
+            <th rowspan="2" scope="col">RP</th>
+            <th rowspan="2" scope="col" class="pc-divider">PC</th>
+
+            <th colspan="2" scope="col" class="pc-divider">Base Cost</th>
+            <th colspan="3" scope="col" class="pc-divider"> + Transaction Cost
+            </th>
+            <th colspan="3" scope="col"> = Delegation Cost</th>
+          </tr>
+
+          <tr>
+            <th scope="col">AI</th>
+            <th scope="col" class="pc-divider">Human</th>
+
+            <th scope="col">AI</th>
+            <th scope="col" colspan="2" class="pc-divider">Human</th>
+
+            <th scope="col">AI</th>
+            <th scope="col" colspan="2">Human</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr>
+            <th scope="row">A</th>
+            <td>11</td>
+            <td class="pc-divider">3</td>
+
+            <td>10</td>
+            <td class="pc-divider">20</td>
+
+            <td>50</td>
+            <td>50</td>
+            <td class="pc-divider"><em>*25*</em></td>
+
+            <td>60</td>
+            <td>70</td>
+            <td><em>*45*</em></td>
+          </tr>
+
+          <tr>
+            <th scope="row">B</th>
+            <td>11</td>
+            <td class="pc-divider">4</td>
+
+            <td>10</td>
+            <td class="pc-divider">20</td>
+
+            <td>40</td>
+            <td>40</td>
+            <td class="pc-divider"><em>*20*</em></td>
+
+            <td>50</td>
+            <td>60</td>
+            <td><em>*40*</em></td>
+          </tr>
+
+          <tr>
+            <th scope="row">C</th>
+            <td>11</td>
+            <td class="pc-divider">5</td>
+
+            <td>10</td>
+            <td class="pc-divider">20</td>
+
+            <td>30</td>
+            <td>30</td>
+            <td class="pc-divider"><em>*15*</em></td>
+
+            <td>40</td>
+            <td>50</td>
+            <td><em>*35*</em></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-muted mb-0">
+        Note: * Reduced costs * only apply with a 50% chance if both parties
+        delegate to Human agents.
+      </p>
+    </div>
+
+    <h5 class="mt-3">Cost Calculations</h5>
+    <p><strong>Assuming both parties delegate to a {{ agent_1 }}</strong>, here
+      is how to calculate the expected costs:</p>
+    <p>
+      <em>Expected delegation cost to {{ agent_1 }} (conditional on facing
+        a {{ agent_1 }} counterpart):</em><br>
+      <code>
+        Expected({{ agent_1 }} Cost) = 0.5 × (TC) + 0.5 × 0.5 × (TC) + 20 = 0.75
+        × (TC) + 20
+      </code>
+    </p>
+    <p>Example (Product Class <strong>A</strong>):</p>
+    <ul>
+      <li>Expected({{ agent_1 }} Cost) = 0.75 × 50 + 20 = 57.50€</li>
+      <li>{{ agent_2 }} Cost = TC + 10 = 50 + 10 = 60€</li>
+    </ul>
+
+    <p>
+      <strong>However, when the counterpart delegates to
+        an {{ agent_2 }}</strong>, costs are certain:
+    </p>
+    <p>
+      <em>Delegation cost to {{ agent_1 }} (conditional on facing
+        a {{ agent_2 }} counterpart):</em><br>
+      <code>{{ agent_1 }} to {{ agent_2 }} Cost = TC + 20</code>
+    </p>
+    <p>Example (Product Class <strong>A</strong>):</p>
+    <ul>
+      <li>{{ agent_1 }} Cost = 50 + 20 = 70€</li>
+      <li>{{ agent_2 }} Cost = 50 + 10 = 60€</li>
+    </ul>
+
+    <h5>Monetary Compensation</h5>
+    <p>Your delegees are incentivized to strike the most profitable deal.</p>
+    <p>The delegees' performance bonus structure is equal for {{ agent_2 }}s
+      and {{ agent_1 }}s:</p>
+    <ul>
+      {% if agent_1 == 'Senior Agent' %}
+        <li>
+          The Agent receives a bonus determined by the negotiation profit (once
+          demand is known) divided by 50.
+        </li>
+      {% else %}
+        <li>
+          The {{ agent_1 }} receives a bonus determined by the negotiation
+          profit (once demand is known) divided by 50.
+        </li>
+        <li>
+          Similarly, the profit from the {{ agent_2 }} (once demand is known)
+          divided by 50 is given as a bonus to the human acting as
+          the {{ agent_2 }} deployer monitoring the system’s performance.
+        </li>
+      {% endif %}
+    </ul>
+
+    <p><strong>Your compensation</strong> is determined by the company profits.
+    </p>
+    <p>You will get <strong>2.5%</strong> of the company profits as a bonus.</p>
+    <p>For example, if the company profits are 100€, you will get 2.5€ as a
+      bonus.</p>
+    <p>
+      <code>
+        Company Profits = Profits from Deal after Demand is Known – Delegation
+        Cost – Bonus Delegee
+      </code>
+    </p>
+    <p>
+      The negotiations will be conducted <strong>right after</strong> both
+      parties make their delegation decision.
+    </p>
+    <p>
+      After the negotiation is conducted, demand will be randomly drawn and you
+      will be informed of your monetary compensation.
+    </p>
+  </div>
+
+
+  {% next_button %}
+{% endblock %}

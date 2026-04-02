@@ -1,0 +1,39 @@
+<h5>IMPORTANT! How to use the Interface?</h5>
+<p>
+  Agreements made through the chat are non-binding (not final).
+  <br>Only those offers
+  <strong>sent/confirmed through the interface</strong> are binding.<br>
+  Once you reach an agreement, use the <strong>"CONFIRM"</strong> button to
+  <strong> seal the deal </strong> (finish the negotiation).<br>
+</p>
+
+{% if player.bot_opponent %}
+  — Note: This button only appears when the counterpart is ready to accept
+  the offer.<br>
+  — Note: Binding offers can be automatically accepted by the AI Agent.<br>
+  → You can only send binding offers through "Your current proposal":
+  <ol type="1">
+    <li>Wait until the AI Agent asks you to share a Price & Quantity</li>
+    <li>Introduce a Price and Quantity combination</li>
+    <li>Click <strong>Send New Offer</strong></li>
+  </ol>
+{% else %}
+  -> You can only send binding offers through "Your current proposal":<br>
+  <ol type="1">
+    <li>Wait until the AI Agent asks you to share a Price & Quantity</li>
+    <li>Introduce a Price and Quantity combination</li>
+    <li>Click <strong>Send New Offer</strong></li>
+  </ol>
+{% endif %}
+
+{% if player.is_supplier %}
+  <p>
+    Example: Do NOT accept a wholesale price (w) above the Retail Price
+    of {% group.market_price %}€. Otherwise, you don't make a PROFIT.
+  </p>
+{% else %}
+  <p>
+    Example: Do NOT accept a wholesale price (w) above the Retail Price
+    of {% group.market_price %}€. Otherwise, you don't make a PROFIT.
+  </p>
+{% endif %}

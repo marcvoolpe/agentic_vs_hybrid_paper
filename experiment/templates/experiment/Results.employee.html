@@ -1,0 +1,33 @@
+{% if not formatted_deal_price %}
+  <p>
+    No agreement was reached on time.
+  </p>
+  <p>
+    Unfortunately, you will not receive any compensation for participating in
+    this study.
+  </p>
+{% else %}
+  <p>
+    Congratulations, a final deal was made at the price
+    of {% formatted_deal_price %} for {% formatted_deal_quantity %} units,
+    that translates to profits of {% formatted_profit %}.
+  </p>
+  <p>
+    The demand was {% group.demand %}.
+  </p>
+  <p>
+    As financial compensation for participating in this study, you will
+    receive your profit (divided over 50) of
+    <strong>{% formatted_final_payment %}</strong>.
+  </p>
+  <br>
+  <p>
+    Remember this amount <strong>{% formatted_final_payment %} </strong>
+    when you are asked to enter your payment information.<br>
+    If you enter an incorrect amount in the form, we will not be able to
+    process your financial compensation.
+  </p>
+  <a href=https://forms.office.com/e/SXyc0rqK6J">
+    Fill in your bank details
+  </a>
+{% endif %}

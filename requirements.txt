@@ -1,0 +1,1 @@
+otree@git+https://stash.ict.eur.nl/scm/sd_sp/otree---rsm@5.10.5

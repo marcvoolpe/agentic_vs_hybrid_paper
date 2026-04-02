@@ -1,0 +1,85 @@
+{% block title %}
+  Results - Delegation Decisions
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Delegation Results</h4>
+      <p><strong>Your role:</strong> {% player.clean_role %}</p>
+      <hr>
+      <h5>Final Decisions:</h5>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div
+              class="card {% if player.role == C.ROLE_RETAILER_MANAGER %}border-primary{% endif %}">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-2 text-muted">Retailer's Choice</h6>
+              <p class="card-text">
+                <strong>Option {% retailer_choice %}:</strong> {% retailer_choice_display %}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div
+              class="card {% if player.role == C.ROLE_SUPPLIER_MANAGER %}border-primary{% endif %}">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-2 text-muted">Supplier's Choice</h6>
+              <p class="card-text">
+                <strong>Option {% supplier_choice %}:</strong> {% supplier_choice_display %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+
+      <div class="alert alert-{%
+          if group.both_human_or_senior %}success{% else %}info{% endif
+          %} mt-3">
+        <h6><strong>Outcome:</strong></h6>
+        {% if group.both_human_or_senior %}
+          <p>
+            Both parties chose <strong>{% agent_1 %}</strong>!
+          </p>
+          <p>
+            There is a <strong>50% chance</strong> that transaction costs will
+            be <strong>halved</strong> due to relationship building.
+          </p>
+        {% elif group.both_ai_or_junior %}
+          <p>
+            Both parties chose <strong>{% agent_2 %}</strong>.
+          </p>
+          <p>
+            Transaction costs remain at the standard rate with no relationship
+            building opportunity.
+          </p>
+        {% else %}
+          <p>
+            One party chose <strong>{% agent_1 %}</strong> and the
+            other chose <strong>{% agent_2 %}</strong>.
+          </p>
+          <p>
+            Transaction costs are <strong>certain</strong> with no chance of
+            reduction.
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="alert alert-secondary">
+        <p><strong>Next Steps:</strong></p>
+        <p>
+          The negotiation will now proceed based on these delegation decisions.
+          Your compensation will be calculated after the negotiation concludes
+          and demand is realized.
+        </p>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  {% next_button %}
+{% endblock %}

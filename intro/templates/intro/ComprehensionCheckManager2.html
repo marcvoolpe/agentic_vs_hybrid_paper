@@ -1,0 +1,71 @@
+{% block styles %}
+  <link rel="stylesheet" type="text/css"
+        href="{% static "intro/css/instructions.css" %}"/>
+{% endblock %}
+
+{% block title %}
+  Manager Comprehension Check 2/4 - Exact Delegation Cost (Full TC)
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h3>{% formfield_errors 'comprehension_answer_a' %}{% formfield_errors 'comprehension_answer_b' %}</h3>
+      
+      <div class="question-box">
+        <h4>Question {{ product_question_number }}/{{ total_product_questions }}:</h4>
+        <p>
+          <strong>Given your counterpart delegates the Product Class {{ product_class }} negotiation to a {{ agent_1 }}.</strong>
+        </p>
+        
+        <div class="cost-table">
+          <h5>Product Class {{ product_class }} Details:</h5>
+          <ul>
+            <li><strong>Transaction Cost (TC):</strong> €{{ question.tc }}</li>
+            <li><strong>Scenario:</strong> Transaction costs are <strong>NOT halved</strong> (full amount)</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-info mt-3">
+          <h5>Calculate the exact delegation cost:</h5>
+          <p>
+            <strong>a. What is the exact delegation cost to a {{ agent_1 }}?</strong><br>
+            <em>(Full Transaction Cost + Base Cost of 20)</em>
+          </p>
+          <input name="comprehension_answer_a" type="number" step="0.01" inputmode="decimal"
+                 class="form-control" required="" placeholder="Enter amount">
+          
+          <p style="margin-top: 15px;">
+            <strong>b. What is the exact delegation cost to a {{ agent_2 }}?</strong><br>
+            <em>(Transaction Cost + Base Cost of 10)</em>
+          </p>
+          <input name="comprehension_answer_b" type="number" step="0.01" inputmode="decimal"
+                 class="form-control" required="" placeholder="Enter amount">
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <strong>Formula Reminder:</strong>
+        <ul>
+          <li>Delegation Cost = Transaction Cost + Base Cost</li>
+          <li>Base Cost for {{ agent_1 }}: 20€</li>
+          <li>Base Cost for {{ agent_2 }}: 10€</li>
+        </ul>
+      </div>
+
+      <div class="alert alert-warning mt-3">
+        <strong>Progress:</strong> Question {{ product_question_number }} of {{ total_product_questions }} (Product Class {{ product_class }})
+        <br>
+        <strong>How it works:</strong>
+        <ul>
+          <li>You must answer 3 questions for Product Classes C, A, and B</li>
+          <li><strong>Each incorrect answer moves you to the next product class</strong></li>
+          <li>You must answer all 3 product classes correctly to advance to the next comprehension check</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  {% next_button %}
+{% endblock %}

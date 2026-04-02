@@ -1,0 +1,71 @@
+{% block styles %}
+  <link rel="stylesheet" type="text/css"
+        href="{% static "intro/css/instructions.css" %}"/>
+{% endblock %}
+
+{% block title %}
+  Manager Comprehension Check 4/4 - Expected Delegation Cost
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h3>{% formfield_errors 'comprehension_answer_a' %}{% formfield_errors 'comprehension_answer_b' %}</h3>
+      
+      <div class="question-box">
+        <h4>Question {{ product_question_number }}/{{ total_product_questions }}:</h4>
+        <p>
+          <strong>Given your counterpart delegates the Product Class {{ product_class }} negotiation to a {{ agent_1 }}.</strong>
+        </p>
+        
+        <div class="cost-table">
+          <h5>Product Class {{ product_class }} Details:</h5>
+          <ul>
+            <li><strong>Transaction Cost (TC):</strong> €{{ question.tc }}</li>
+            <li><strong>Scenario:</strong> Calculate the <strong>EXPECTED</strong> delegation cost (considering 50% probability of halving)</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-info mt-3">
+          <h5>Calculate the expected delegation cost:</h5>
+          <p>
+            <strong>a. What is the EXPECTED delegation cost to a {{ agent_1 }}?</strong><br>
+            <em>Expected Cost = 0.75 × TC + 20</em>
+          </p>
+          <input name="comprehension_answer_a" type="number" step="0.01" inputmode="decimal"
+                 class="form-control" required="" placeholder="Enter amount">
+          
+          <p style="margin-top: 15px;">
+            <strong>b. What is the exact delegation cost to a {{ agent_2 }}?</strong><br>
+            <em>({{ agent_2 }} costs are always certain)</em>
+          </p>
+          <input name="comprehension_answer_b" type="number" step="0.01" inputmode="decimal"
+                 class="form-control" required="" placeholder="Enter amount">
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <strong>Formula Reminder:</strong>
+        <ul>
+          <li>Expected {{ agent_1 }} Cost = 0.75 × TC + 20</li>
+          <li>This accounts for 50% chance of halving and 50% chance of full TC</li>
+          <li>{{ agent_2 }} Cost (always certain) = TC + 10</li>
+        </ul>
+      </div>
+
+      <div class="alert alert-warning mt-3">
+        <strong>Progress:</strong> Question {{ product_question_number }} of {{ total_product_questions }} (Product Class {{ product_class }})
+        <br>
+        <strong>How it works:</strong>
+        <ul>
+          <li>You must answer 3 questions for Product Classes C, A, and B</li>
+          <li><strong>Each incorrect answer moves you to the next product class</strong></li>
+          <li>You must answer all 3 product classes correctly to advance to the next comprehension check</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  {% next_button %}
+{% endblock %}

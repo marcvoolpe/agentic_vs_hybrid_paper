@@ -1,0 +1,362 @@
+[2026-01-24 09:33:08] HOST http://localhost:11434
+[2026-01-24 16:25:29] HOST http://localhost:11434
+[2026-01-24 16:26:56] [DEBUG Offer.evaluate] Offer: price = 10, quantity = 60, profit_bot = 42.0, profit_user = 240.0, is_valid = True
+[2026-01-24 16:26:56] Price 10.00 too high. Bot (retail) max profit = 50.00 < Nash 145.55
+[2026-01-24 16:26:56] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 16:26:56] [DEBUG optimal_solution_string] optimal_price: 7.53, optimal_quantity: 60.0, target_profit: 145.55
+[2026-01-24 16:27:11] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm not satisfied with your offer. I can do better than that. How about a price of 7.53€ and quantity of 60?
+[2026-01-24 16:27:11] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm not satisfied with your offer. I can do better than that. How about a price of 7.53€ and quantity of 60?
+[2026-01-24 16:27:11] [DEBUG Offer.evaluate] Offer: price = 7.53, quantity = 60, profit_bot = 145.73999999999998, profit_user = 136.26, is_valid = True
+[2026-01-24 16:27:11] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:27:11] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 16:28:04] [DEBUG Offer.evaluate] Offer: price = 7, quantity = 60, profit_bot = 168.0, profit_user = 114.0, is_valid = True
+[2026-01-24 16:28:04] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:30:14] HOST http://localhost:11434
+[2026-01-24 16:30:50] [DEBUG Offer.evaluate] Offer: price = 8, quantity = 70, profit_bot = 136.5, profit_user = 84.0, is_valid = True
+[2026-01-24 16:30:50] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:31:45] HOST http://localhost:11434
+[2026-01-24 16:32:16] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = 70, profit_bot = 136.5, profit_user = 154.0, is_valid = True
+[2026-01-24 16:33:06] [DEBUG Offer.evaluate] Offer: price = 7.86, quantity = 73, profit_bot = 145.55469999999997, profit_user = 145.3503, is_valid = True
+[2026-01-24 16:33:06] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:34:33] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:34:33] [DEBUG Offer.evaluate] Offer: price = None, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 16:34:33] [DEBUG Offer.evaluate] Result Evaluation: not_offer
+[2026-01-24 16:34:33] [DEBUG optimal_solution_string] optimal_price: 7.86, optimal_quantity: 73, target_profit: 145.55
+[2026-01-24 16:34:36] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message Here is the response:
+
+I understand. Could you please suggest a specific wholesale price that would work for you?
+[2026-01-24 16:34:36] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand. Could you please suggest a specific wholesale price that would work for you?
+[2026-01-24 16:34:36] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:34:36] [DEBUG Bot_strategy.respond_to_offer] 5 - Not complete and respond_to_non_offer
+[2026-01-24 16:34:47] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = 70, profit_bot = 136.5, profit_user = 154.0, is_valid = True
+[2026-01-24 16:34:55] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = 40, profit_bot = 96.0, profit_user = 136.0, is_valid = True
+[2026-01-24 16:35:14] [DEBUG Offer.evaluate] Offer: price = 5, quantity = 80, profit_bot = 288.0, profit_user = 0.0, is_valid = True
+[2026-01-24 16:35:14] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:36:55] HOST http://localhost:11434
+[2026-01-24 16:37:27] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:37:27] [DEBUG Offer.evaluate] Offer: price = None, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 16:37:27] [DEBUG Offer.evaluate] Result Evaluation: not_offer
+[2026-01-24 16:37:27] [DEBUG optimal_solution_string] optimal_price: 8.43, optimal_quantity: 64, target_profit: 111.84
+[2026-01-24 16:37:29] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your proposal. How about a wholesale price of 8.43€ for a quantity of 64 units?
+[2026-01-24 16:37:29] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your proposal. How about a wholesale price of 8.43€ for a quantity of 64 units?
+[2026-01-24 16:37:29] [DEBUG Offer.evaluate] Offer: price = 8.43, quantity = 64, profit_bot = 111.84640000000002, profit_user = 110.87360000000001, is_valid = True
+[2026-01-24 16:37:29] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:37:29] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 16:37:36] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:37:36] [DEBUG Offer.evaluate] Offer: price = None, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 16:37:36] [DEBUG Offer.evaluate] Result Evaluation: not_offer
+[2026-01-24 16:37:36] [DEBUG optimal_solution_string] optimal_price: 8.43, optimal_quantity: 64, target_profit: 111.84
+[2026-01-24 16:37:40] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message Here is my response:
+
+What specific quantity do you have in mind?
+
+(Note: I'm following Rule 2.c, as the counterpart's message "hi" doesn't contain any information related to the negotiation or a specific proposal.)
+[2026-01-24 16:37:40] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output What specific quantity do you have in mind?
+[2026-01-24 16:37:40] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:37:40] [DEBUG Bot_strategy.respond_to_offer] 5 - Not complete and respond_to_non_offer
+[2026-01-24 16:39:51] HOST http://localhost:11434
+[2026-01-24 16:40:12] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:40:12] [DEBUG Offer.evaluate] Offer: price = None, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 16:40:12] [DEBUG Offer.evaluate] Result Evaluation: not_offer
+[2026-01-24 16:40:12] [DEBUG optimal_solution_string] optimal_price: 8.43, optimal_quantity: 64, target_profit: 111.84
+[2026-01-24 16:40:13] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your request.
+[2026-01-24 16:40:13] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your request.
+[2026-01-24 16:40:13] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 16:40:13] [DEBUG Bot_strategy.respond_to_offer] 5 - Not complete and respond_to_non_offer
+[2026-01-24 16:47:32] HOST http://localhost:11434
+[2026-01-24 16:48:22] [DEBUG Bot_llm.interpret_offer] [8.00€,]
+
+[2026-01-24 16:48:22] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 16:48:22] Price 8.00 too low. Bot (supplier) max profit = 100.00 < Nash 110.87
+[2026-01-24 16:48:22] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_both
+[2026-01-24 16:48:22] [DEBUG optimal_solution_string] optimal_price: 8.43, optimal_quantity: 64, target_profit: 110.87
+[2026-01-24 16:51:44] HOST http://localhost:11434
+[2026-01-24 16:52:02] [DEBUG Bot_llm.interpret_offer] [8.00€,]
+
+[2026-01-24 16:52:02] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 16:52:02] Price 8.00 too low. Bot (supplier) max profit = 56.25 < Nash 81.48
+[2026-01-24 16:52:02] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_both
+[2026-01-24 16:52:02] [DEBUG optimal_solution_string] optimal_price: 8.94, optimal_quantity: 55, target_profit: 81.48
+[2026-01-24 16:52:12] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by your offer, considering our discussion so far. I'd like to propose a more balanced solution: price of 8.94€ and quantity of 55.
+[2026-01-24 16:52:12] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output price of 8.94€ and quantity of 55.
+[2026-01-24 16:52:12] [DEBUG Offer.evaluate] Offer: price = 8.94, quantity = 55, profit_bot = 81.48249999999996, profit_user = 82.14250000000003, is_valid = True
+[2026-01-24 16:52:12] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 16:52:12] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 16:53:26] [DEBUG Offer.evaluate] Offer: price = 10, quantity = 50, profit_bot = 125.0, profit_user = 37.5, is_valid = True
+[2026-01-24 16:53:26] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:02:48] HOST http://localhost:11434
+[2026-01-24 17:03:27] [DEBUG Bot_llm.interpret_offer] [5.00€,]
+
+[2026-01-24 17:03:27] [DEBUG Offer.evaluate] Offer: price = 5.0, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 17:03:27] Price 5.00 too low. Bot (supplier) max profit = 40.00 < Nash 145.35
+[2026-01-24 17:03:27] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_both
+[2026-01-24 17:03:27] [DEBUG optimal_solution_string] optimal_price: 7.86, optimal_quantity: 73, target_profit: 145.35
+[2026-01-24 17:03:37] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by your offer. Considering our conversation so far, I'll make a new proposal: [Price of 7.86€ and quantity of 73].
+[2026-01-24 17:03:37] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output Price of 7.86€ and quantity of 73].
+[2026-01-24 17:03:37] [DEBUG Offer.evaluate] Offer: price = 7.86, quantity = 73, profit_bot = 145.3503, profit_user = 145.55469999999997, is_valid = True
+[2026-01-24 17:03:37] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:03:37] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:03:38] [DEBUG Offer.evaluate] Offer: price = 5.0, quantity = 70, profit_bot = 17.5, profit_user = 273.0, is_valid = True
+[2026-01-24 17:03:38] Price 5.00 too low. Bot (supplier) max profit = 40.00 < Nash 145.35
+[2026-01-24 17:03:38] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:03:38] [DEBUG optimal_solution_string] optimal_price: 7.81, optimal_quantity: 70.0, target_profit: 145.35
+[2026-01-24 17:03:41] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your proposal, but I'm afraid it's not profitable for me. I'd like to counteroffer with a price of 7.81€ and quantity of 70.0.
+[2026-01-24 17:03:41] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your proposal, but I'm afraid it's not profitable for me. I'd like to counteroffer with a price of 7.81€ and quantity of 70.0.
+[2026-01-24 17:03:41] [DEBUG Offer.evaluate] Offer: price = 7.81, quantity = 70, profit_bot = 145.35499999999996, profit_user = 145.145, is_valid = True
+[2026-01-24 17:03:41] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:03:41] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:03:55] [DEBUG Offer.evaluate] Offer: price = 5, quantity = 70, profit_bot = 17.5, profit_user = 273.0, is_valid = True
+[2026-01-24 17:03:55] Price 5.00 too low. Bot (supplier) max profit = 40.00 < Nash 145.35
+[2026-01-24 17:03:55] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:03:55] [DEBUG optimal_solution_string] optimal_price: 7.81, optimal_quantity: 70.0, target_profit: 145.35
+[2026-01-24 17:03:58] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your proposal, but it's still not profitable for me. I'm willing to compromise with a price of 7.81€ and quantity of 70.0.
+[2026-01-24 17:03:58] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your proposal, but it's still not profitable for me. I'm willing to compromise with a price of 7.81€ and quantity of 70.0.
+[2026-01-24 17:03:58] [DEBUG Offer.evaluate] Offer: price = 7.81, quantity = 70, profit_bot = 145.35499999999996, profit_user = 145.145, is_valid = True
+[2026-01-24 17:03:58] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:03:58] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:04:29] [DEBUG Offer.evaluate] Offer: price = 10, quantity = 95, profit_bot = 213.75, profit_user = 49.875, is_valid = True
+[2026-01-24 17:04:29] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:05:34] HOST http://localhost:11434
+[2026-01-24 17:05:58] [DEBUG Bot_llm.interpret_offer] [5.00€,]
+
+[2026-01-24 17:05:58] [DEBUG Offer.evaluate] Offer: price = 5.0, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 17:05:58] Price 5.00 too low. Bot (supplier) max profit = 0.00 < Nash 81.48
+[2026-01-24 17:05:58] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_both
+[2026-01-24 17:05:58] [DEBUG optimal_solution_string] optimal_price: 8.94, optimal_quantity: 55, target_profit: 81.48
+[2026-01-24 17:06:09] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by your offer. Since my production cost is fixed at 5€, I can't accept a price lower than that. Considering this, I propose a more reasonable deal: 8.94€ and 55 units.
+[2026-01-24 17:06:09] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output 8.94€ and 55 units.
+[2026-01-24 17:06:09] [DEBUG Offer.evaluate] Offer: price = 8.94, quantity = 55, profit_bot = 81.48249999999996, profit_user = 82.14250000000003, is_valid = True
+[2026-01-24 17:06:09] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:06:09] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:06:33] [DEBUG Offer.evaluate] Offer: price = 6, quantity = 50, profit_bot = -25.0, profit_user = 187.5, is_valid = True
+[2026-01-24 17:06:33] Price 6.00 too low. Bot (supplier) max profit = 8.33 < Nash 81.48
+[2026-01-24 17:06:33] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:06:33] [DEBUG optimal_solution_string] optimal_price: 8.84, optimal_quantity: 50.0, target_profit: 81.48
+[2026-01-24 17:06:36] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your proposal, but I'm afraid it's not profitable for me. I'd like to counteroffer with a price of 8.84€ and quantity of 50.
+[2026-01-24 17:06:36] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your proposal, but I'm afraid it's not profitable for me. I'd like to counteroffer with a price of 8.84€ and quantity of 50.
+[2026-01-24 17:06:36] [DEBUG Offer.evaluate] Offer: price = 8.84, quantity = 50, profit_bot = 81.5, profit_user = 81.0, is_valid = True
+[2026-01-24 17:06:36] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:06:36] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:06:55] [DEBUG Offer.evaluate] Offer: price = 6, quantity = 49, profit_bot = -23.03000000000003, profit_user = 184.975, is_valid = True
+[2026-01-24 17:06:55] Price 6.00 too low. Bot (supplier) max profit = 8.33 < Nash 81.48
+[2026-01-24 17:06:55] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:06:55] [DEBUG optimal_solution_string] optimal_price: 8.83, optimal_quantity: 49.0, target_profit: 81.48
+[2026-01-24 17:06:59] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your proposal, but I'm afraid it's not profitable for me. Considering our previous discussions, I'd like to counteroffer with a price of 8.83€ and quantity of 49.0.
+[2026-01-24 17:06:59] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your proposal, but I'm afraid it's not profitable for me. Considering our previous discussions, I'd like to counteroffer with a price of 8.83€ and quantity of 49.0.
+[2026-01-24 17:06:59] [DEBUG Offer.evaluate] Offer: price = 8.83, quantity = 49, profit_bot = 81.66584999999998, profit_user = 80.27914999999999, is_valid = True
+[2026-01-24 17:06:59] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:06:59] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:07:07] [DEBUG Offer.evaluate] Offer: price = 8.8, quantity = 49, profit_bot = 80.55599999999998, profit_user = 81.38899999999997, is_valid = True
+[2026-01-24 17:07:29] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 45, profit_bot = 88.875, profit_user = 69.75, is_valid = True
+[2026-01-24 17:07:29] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:10:34] HOST http://localhost:11434
+[2026-01-24 17:11:03] [DEBUG Offer.evaluate] Offer: price = 5.0, quantity = 60, profit_bot = 30.0, profit_user = 252.0, is_valid = True
+[2026-01-24 17:11:03] Price 5.00 too low. Bot (supplier) max profit = 40.00 < Nash 145.35
+[2026-01-24 17:11:03] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:11:03] [DEBUG optimal_solution_string] optimal_price: 7.75, optimal_quantity: 60.0, target_profit: 145.35
+[2026-01-24 17:11:07] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your offer, but I'm concerned about the profitability. Let's explore a more balanced solution. How about 7.75€ and 60 units?
+[2026-01-24 17:11:07] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your offer, but I'm concerned about the profitability. Let's explore a more balanced solution. How about 7.75€ and 60 units?
+[2026-01-24 17:11:07] [DEBUG Offer.evaluate] Offer: price = 7.75, quantity = 60, profit_bot = 145.5, profit_user = 136.5, is_valid = True
+[2026-01-24 17:11:07] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:11:07] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:11:49] [DEBUG Offer.evaluate] Offer: price = 10.0, quantity = 60, profit_bot = 240.0, profit_user = 42.0, is_valid = True
+[2026-01-24 17:11:49] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:12:35] [DEBUG Offer.evaluate] Offer: price = 12.0, quantity = 40, profit_bot = 264.0, profit_user = -32.0, is_valid = True
+[2026-01-24 17:12:35] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:13:48] [DEBUG Offer.evaluate] Offer: price = 5, quantity = 60, profit_bot = 30.0, profit_user = 252.0, is_valid = True
+[2026-01-24 17:13:48] Price 5.00 too low. Bot (supplier) max profit = 40.00 < Nash 145.35
+[2026-01-24 17:13:48] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:13:48] [DEBUG optimal_solution_string] optimal_price: 7.75, optimal_quantity: 60.0, target_profit: 145.35
+[2026-01-24 17:13:52] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I understand your offer, but I'm concerned about the profitability. Let's explore a more balanced solution. How about 7.75€ and 60 units?
+[2026-01-24 17:13:52] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand your offer, but I'm concerned about the profitability. Let's explore a more balanced solution. How about 7.75€ and 60 units?
+[2026-01-24 17:13:52] [DEBUG Offer.evaluate] Offer: price = 7.75, quantity = 60, profit_bot = 145.5, profit_user = 136.5, is_valid = True
+[2026-01-24 17:13:52] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:13:52] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:14:18] [DEBUG Offer.evaluate] Offer: price = 12, quantity = 50, profit_bot = 300.0, profit_user = -37.5, is_valid = True
+[2026-01-24 17:14:18] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:17:15] HOST http://localhost:11434
+[2026-01-24 17:17:29] HOST http://localhost:11434
+[2026-01-24 17:18:11] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 50, profit_bot = 87.5, profit_user = 75.0, is_valid = True
+[2026-01-24 17:18:11] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:23:12] HOST http://localhost:11434
+[2026-01-24 17:23:50] [DEBUG Offer.evaluate] Offer: price = 8.4, quantity = 64, profit_bot = 113.15199999999999, profit_user = 109.56800000000004, is_valid = True
+[2026-01-24 17:23:50] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:26:04] HOST http://localhost:11434
+[2026-01-24 17:26:27] [DEBUG Offer.evaluate] Offer: price = 8.4, quantity = 64, profit_bot = 109.56800000000004, profit_user = 113.15199999999999, is_valid = True
+[2026-01-24 17:26:44] [DEBUG Offer.evaluate] Offer: price = 8, quantity = 70, profit_bot = 84.0, profit_user = 136.5, is_valid = True
+[2026-01-24 17:26:44] Price 8.00 too low. Bot (supplier) max profit = 100.00 < Nash 110.87
+[2026-01-24 17:26:44] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:26:44] [DEBUG optimal_solution_string] optimal_price: 8.6, optimal_quantity: 70.0, target_profit: 110.87
+[2026-01-24 17:26:49] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I appreciate your offer, but I'm concerned about the profitability. Considering our conversation, I'd like to propose a new offer: Price of 8.60€ and quantity of 70. This combination balances our interests while ensuring a fair deal for both parties.
+[2026-01-24 17:26:49] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output Price of 8.60€ and quantity of 70. This combination balances our interests while ensuring a fair deal for both parties.
+[2026-01-24 17:26:49] [DEBUG Offer.evaluate] Offer: price = 8.6, quantity = 70, profit_bot = 111.30000000000001, profit_user = 109.20000000000002, is_valid = True
+[2026-01-24 17:26:49] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:26:49] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:27:17] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 17:27:17] [DEBUG Offer.evaluate] Offer: price = None, quantity = None, profit_bot = -11, profit_user = -10, is_valid = False
+[2026-01-24 17:27:17] [DEBUG Offer.evaluate] Result Evaluation: not_offer
+[2026-01-24 17:27:17] [DEBUG optimal_solution_string] optimal_price: 8.43, optimal_quantity: 64, target_profit: 110.87
+[2026-01-24 17:27:22] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message Here is the response:
+
+I understand. Could you please suggest a specific price that would work for you?
+
+(Note: I'm responding to Rule 2.b, as the counterpart message "so?" doesn't give any hint about their desired price or quantity.)
+[2026-01-24 17:27:22] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I understand. Could you please suggest a specific price that would work for you?
+[2026-01-24 17:27:22] [DEBUG Bot_llm.interpret_offer] [,]
+[2026-01-24 17:27:22] [DEBUG Bot_strategy.respond_to_offer] 5 - Not complete and respond_to_non_offer
+[2026-01-24 17:27:35] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 70, profit_bot = 129.5, profit_user = 91.0, is_valid = True
+[2026-01-24 17:27:35] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:31:55] HOST http://localhost:11434
+[2026-01-24 17:32:34] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 50, profit_bot = 137.5, profit_user = 75.0, is_valid = True
+[2026-01-24 17:32:34] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:34:10] HOST http://localhost:11434
+[2026-01-24 17:34:31] [DEBUG Offer.evaluate] Offer: price = 8.94, quantity = 55, profit_bot = 82.14250000000003, profit_user = 81.48249999999996, is_valid = True
+[2026-01-24 17:34:31] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:34:49] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 55, profit_bot = 79.75, profit_user = 83.875, is_valid = True
+[2026-01-24 17:35:26] [DEBUG Offer.evaluate] Offer: price = 8, quantity = 50, profit_bot = 112.5, profit_user = 50.0, is_valid = True
+[2026-01-24 17:35:26] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:36:33] HOST http://localhost:11434
+[2026-01-24 17:38:17] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 50, profit_bot = 87.5, profit_user = 75.0, is_valid = True
+[2026-01-24 17:38:17] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:38:38] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 50, profit_bot = 87.5, profit_user = 75.0, is_valid = True
+[2026-01-24 17:38:38] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:41:11] HOST http://localhost:11434
+[2026-01-24 17:42:14] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 55, profit_bot = 83.875, profit_user = 79.75, is_valid = True
+[2026-01-24 17:42:14] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:42:26] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 55, profit_bot = 83.875, profit_user = 79.75, is_valid = True
+[2026-01-24 17:42:26] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:47:39] HOST http://localhost:11434
+[2026-01-24 17:47:57] HOST http://localhost:11434
+[2026-01-24 17:48:23] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 55, profit_bot = 83.875, profit_user = 79.75, is_valid = True
+[2026-01-24 17:48:23] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:48:51] [DEBUG Offer.evaluate] Offer: price = 12.0, quantity = 70, profit_bot = 196.0, profit_user = -45.5, is_valid = True
+[2026-01-24 17:48:51] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:51:00] [DEBUG Offer.evaluate] Offer: price = 6.0, quantity = 1, profit_bot = 0.9699999999999998, profit_user = 4.975, is_valid = True
+[2026-01-24 17:51:00] Price 6.00 too low. Bot (supplier) max profit = 8.33 < Nash 81.48
+[2026-01-24 17:51:00] Quantity 1 requires price 86.91 >= market price 11.00
+[2026-01-24 17:51:00] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_both
+[2026-01-24 17:51:00] [DEBUG optimal_solution_string] optimal_price: 8.94, optimal_quantity: 55, target_profit: 81.48
+[2026-01-24 17:51:03] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by the lowball offer. I'd like to revisit the negotiation with a more reasonable proposal: price of 8.94€ and quantity of 55.
+[2026-01-24 17:51:03] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output price of 8.94€ and quantity of 55.
+[2026-01-24 17:51:03] [DEBUG Offer.evaluate] Offer: price = 8.94, quantity = 55, profit_bot = 81.48249999999996, profit_user = 82.14250000000003, is_valid = True
+[2026-01-24 17:51:03] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:51:03] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:51:18] [DEBUG Offer.evaluate] Offer: price = 12.0, quantity = 70, profit_bot = 196.0, profit_user = -45.5, is_valid = True
+[2026-01-24 17:51:18] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:52:51] HOST http://localhost:11434
+[2026-01-24 17:53:39] [DEBUG Offer.evaluate] Offer: price = 10.0, quantity = 50, profit_bot = 37.5, profit_user = 125.0, is_valid = True
+[2026-01-24 17:53:39] Price 10.00 too high. Bot (retail) max profit = 50.00 < Nash 82.14
+[2026-01-24 17:53:39] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:53:39] [DEBUG optimal_solution_string] optimal_price: 8.8, optimal_quantity: 50.0, target_profit: 82.14
+[2026-01-24 17:53:42] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm not satisfied with this offer. I can do better. How about a price of 8.80€ for 50 units?
+[2026-01-24 17:53:42] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm not satisfied with this offer. I can do better. How about a price of 8.80€ for 50 units?
+[2026-01-24 17:53:42] [DEBUG Offer.evaluate] Offer: price = 8.8, quantity = 50, profit_bot = 82.49999999999997, profit_user = 80.0, is_valid = True
+[2026-01-24 17:53:42] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:53:42] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:53:54] [DEBUG Offer.evaluate] Offer: price = 12.0, quantity = 50, profit_bot = -37.5, profit_user = 200.0, is_valid = True
+[2026-01-24 17:53:54] Price 12.00 too high. Bot (retail) max profit = -50.00 < Nash 82.14
+[2026-01-24 17:53:54] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:53:54] [DEBUG optimal_solution_string] optimal_price: 8.8, optimal_quantity: 50.0, target_profit: 82.14
+[2026-01-24 17:53:57] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by the sudden increase in price and decrease in quantity. Let's revisit the retail price of 11€, which is fixed. I'll offer a more competitive deal: 8.80€ for 50 units.
+[2026-01-24 17:53:57] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output 8.80€ for 50 units.
+[2026-01-24 17:53:57] [DEBUG Offer.evaluate] Offer: price = 8.8, quantity = 50, profit_bot = 82.49999999999997, profit_user = 80.0, is_valid = True
+[2026-01-24 17:53:57] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:53:57] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:54:03] [DEBUG Offer.evaluate] Offer: price = 6.0, quantity = 60, profit_bot = 210.0, profit_user = -48.0, is_valid = True
+[2026-01-24 17:54:03] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:54:16] [DEBUG Offer.evaluate] Offer: price = 12, quantity = 50, profit_bot = -37.5, profit_user = 200.0, is_valid = True
+[2026-01-24 17:54:16] Price 12.00 too high. Bot (retail) max profit = -50.00 < Nash 82.14
+[2026-01-24 17:54:16] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:54:16] [DEBUG optimal_solution_string] optimal_price: 8.8, optimal_quantity: 50.0, target_profit: 82.14
+[2026-01-24 17:54:18] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm not impressed with this offer. I can do better. How about a price of 8.80€ for 50 units?
+[2026-01-24 17:54:18] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm not impressed with this offer. I can do better. How about a price of 8.80€ for 50 units?
+[2026-01-24 17:54:18] [DEBUG Offer.evaluate] Offer: price = 8.8, quantity = 50, profit_bot = 82.49999999999997, profit_user = 80.0, is_valid = True
+[2026-01-24 17:54:18] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:54:18] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:54:29] [DEBUG Offer.evaluate] Offer: price = 10, quantity = 50, profit_bot = 37.5, profit_user = 125.0, is_valid = True
+[2026-01-24 17:54:29] Price 10.00 too high. Bot (retail) max profit = 50.00 < Nash 82.14
+[2026-01-24 17:54:29] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 17:54:29] [DEBUG optimal_solution_string] optimal_price: 8.8, optimal_quantity: 50.0, target_profit: 82.14
+[2026-01-24 17:54:32] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm not impressed with your latest offer. I think we can do better. How about a price of 8.80€ for 50 units?
+[2026-01-24 17:54:32] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm not impressed with your latest offer. I think we can do better. How about a price of 8.80€ for 50 units?
+[2026-01-24 17:54:32] [DEBUG Offer.evaluate] Offer: price = 8.8, quantity = 50, profit_bot = 82.49999999999997, profit_user = 80.0, is_valid = True
+[2026-01-24 17:54:32] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 17:54:32] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 17:54:39] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 60, profit_bot = 84.0, profit_user = 78.0, is_valid = True
+[2026-01-24 17:54:39] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:03:35] HOST http://localhost:11434
+[2026-01-24 18:04:20] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = 80, profit_bot = 144.0, profit_user = 64.0, is_valid = True
+[2026-01-24 18:04:20] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:05:19] [DEBUG Offer.evaluate] Offer: price = 11, quantity = 80, profit_bot = 0.0, profit_user = 208.0, is_valid = True
+[2026-01-24 18:05:19] Price 11.00 too high. Bot (retail) max profit = 0.00 < Nash 111.84
+[2026-01-24 18:05:19] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 18:05:19] [DEBUG optimal_solution_string] optimal_price: 8.67, optimal_quantity: 80.0, target_profit: 111.84
+[2026-01-24 18:05:22] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by your new offer. I was expecting a more competitive Wholesale Price considering our previous discussion. I'll make a counteroffer: Price of 8.67€ and quantity of 80.
+[2026-01-24 18:05:22] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output Price of 8.67€ and quantity of 80.
+[2026-01-24 18:05:22] [DEBUG Offer.evaluate] Offer: price = 8.67, quantity = 80, profit_bot = 111.84, profit_user = 96.15999999999997, is_valid = True
+[2026-01-24 18:05:22] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:05:22] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 18:05:29] [DEBUG Offer.evaluate] Offer: price = 8, quantity = 60, profit_bot = 126.0, profit_user = 96.0, is_valid = True
+[2026-01-24 18:05:29] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:07:37] HOST http://localhost:11434
+[2026-01-24 18:08:05] [DEBUG Offer.evaluate] Offer: price = 10, quantity = 50, profit_bot = 37.5, profit_user = 125.0, is_valid = True
+[2026-01-24 18:08:05] Price 10.00 too high. Bot (retail) max profit = 50.00 < Nash 82.14
+[2026-01-24 18:08:05] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 18:08:05] [DEBUG optimal_solution_string] optimal_price: 8.8, optimal_quantity: 50.0, target_profit: 82.14
+[2026-01-24 18:08:09] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm not satisfied with your offer. I can only accept a price below 11€, considering my fixed retail price. I'll counter with 8.80€ and 50 units.
+[2026-01-24 18:08:09] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm not satisfied with your offer. I can only accept a price below 11€, considering my fixed retail price. I'll counter with 8.80€ and 50 units.
+[2026-01-24 18:08:09] [DEBUG Offer.evaluate] Offer: price = 11.0, quantity = 50, profit_bot = 0.0, profit_user = 162.5, is_valid = True
+[2026-01-24 18:08:09] Price 11.00 too high. Bot (retail) max profit = 0.00 < Nash 82.14
+[2026-01-24 18:08:09] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 18:08:09] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer not_profitable_on_price
+[2026-01-24 18:08:12] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm not satisfied with your offer. I can only accept a price below 11€, considering my fixed retail price. I'll counter with 8.80€ and 50 units.
+[2026-01-24 18:08:12] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm not satisfied with your offer. I can only accept a price below 11€, considering my fixed retail price. I'll counter with 8.80€ and 50 units.
+[2026-01-24 18:08:12] [DEBUG Offer.evaluate] Offer: price = 11.0, quantity = 50, profit_bot = 0.0, profit_user = 162.5, is_valid = True
+[2026-01-24 18:08:12] Price 11.00 too high. Bot (retail) max profit = 0.00 < Nash 82.14
+[2026-01-24 18:08:12] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-24 18:08:12] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer not_profitable_on_price
+[2026-01-24 18:08:15] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I appreciate your initial offer, but I'm looking for a better deal. I'll propose 8.80€ as the wholesale price and 50 units to start with.
+[2026-01-24 18:08:15] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I appreciate your initial offer, but I'm looking for a better deal. I'll propose 8.80€ as the wholesale price and 50 units to start with.
+[2026-01-24 18:08:15] [DEBUG Offer.evaluate] Offer: price = 8.8, quantity = 50, profit_bot = 82.49999999999997, profit_user = 80.0, is_valid = True
+[2026-01-24 18:08:15] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:08:15] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 18:08:29] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 50, profit_bot = 75.0, profit_user = 87.5, is_valid = True
+[2026-01-24 18:08:51] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 50, profit_bot = 75.0, profit_user = 87.5, is_valid = True
+[2026-01-24 18:09:17] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 5, profit_bot = 9.75, profit_user = 18.875, is_valid = True
+[2026-01-24 18:09:17] Quantity 5 requires negative price for Nash profit
+[2026-01-24 18:09:17] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_quantity
+[2026-01-24 18:09:17] [DEBUG optimal_solution_string] optimal_price: 9.0, optimal_quantity: 58, target_profit: 82.14
+[2026-01-24 18:09:20] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I'm surprised by the sudden drop in quantity, considering our previous discussion. I'll counter with a price of 9.00€ and quantity of 58, hoping to find a mutually beneficial agreement.
+[2026-01-24 18:09:20] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I'm surprised by the sudden drop in quantity, considering our previous discussion. I'll counter with a price of 9.00€ and quantity of 58, hoping to find a mutually beneficial agreement.
+[2026-01-24 18:09:20] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 58, profit_bot = 82.36, profit_user = 80.62, is_valid = True
+[2026-01-24 18:09:20] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:09:20] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept
+[2026-01-24 18:09:30] [DEBUG Offer.evaluate] Offer: price = 9.0, quantity = 58, profit_bot = 82.36, profit_user = 80.62, is_valid = True
+[2026-01-24 18:09:30] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:09:39] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 58, profit_bot = 82.36, profit_user = 80.62, is_valid = True
+[2026-01-24 18:09:39] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:14:10] HOST http://localhost:11434
+[2026-01-24 18:14:43] [DEBUG Offer.evaluate] Offer: price = 8.43, quantity = 64, profit_bot = 110.87360000000001, profit_user = 111.84640000000002, is_valid = True
+[2026-01-24 18:14:43] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:24:47] HOST http://localhost:11434
+[2026-01-24 18:25:07] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 55, profit_bot = 79.75, profit_user = 83.875, is_valid = True
+[2026-01-24 18:25:16] [DEBUG Offer.evaluate] Offer: price = 8, quantity = 55, profit_bot = 119.625, profit_user = 44.0, is_valid = True
+[2026-01-24 18:25:16] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:27:10] HOST http://localhost:11434
+[2026-01-24 18:27:27] [DEBUG Offer.evaluate] Offer: price = 8, quantity = 50, profit_bot = 112.5, profit_user = 50.0, is_valid = True
+[2026-01-24 18:27:27] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:29:43] HOST http://localhost:11434
+[2026-01-24 18:30:16] [DEBUG Offer.evaluate] Offer: price = 8.43, quantity = 64, profit_bot = 110.87360000000001, profit_user = 111.84640000000002, is_valid = True
+[2026-01-24 18:30:16] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-24 18:30:30] [DEBUG Offer.evaluate] Offer: price = 9, quantity = 60, profit_bot = 138.0, profit_user = 84.0, is_valid = True
+[2026-01-24 18:30:30] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-25 14:24:46] HOST http://localhost:11434
+[2026-01-25 14:28:36] [DEBUG Offer.evaluate] Offer: price = 8.0, quantity = 50, profit_bot = 50.0, profit_user = 112.5, is_valid = True
+[2026-01-25 14:28:36] Price 8.00 too low. Bot (supplier) max profit = 56.25 < Nash 81.48
+[2026-01-25 14:28:36] [DEBUG Offer.evaluate] Result Evaluation: not_profitable_on_price
+[2026-01-25 14:28:36] [DEBUG optimal_solution_string] optimal_price: 8.84, optimal_quantity: 50.0, target_profit: 81.48
+[2026-01-25 14:28:48] [DEBUG Bot_strategy.respond_to_offer] 1 - Bot internal message I appreciate your initial offer. Considering our discussion, I'm willing to propose a revised agreement with a Wholesale Price of 8.84€ and Quantity of 50.0.
+[2026-01-25 14:28:48] [DEBUG Bot_strategy.respond_to_offer] 2 - LLM output I appreciate your initial offer. Considering our discussion, I'm willing to propose a revised agreement with a Wholesale Price of 8.84€ and Quantity of 50.0.
+[2026-01-25 14:28:48] [DEBUG Offer.evaluate] Offer: price = 8.84, quantity = 50, profit_bot = 81.5, profit_user = 81.0, is_valid = True
+[2026-01-25 14:28:48] [DEBUG Offer.evaluate] Result Evaluation: accept
+[2026-01-25 14:28:48] [DEBUG Bot_strategy.respond_to_offer] 3 - Evaluation of bot offer accept

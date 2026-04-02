@@ -1,0 +1,212 @@
+{% block title %}
+  Instructions
+{% endblock %}
+
+{% block content %}
+  <div class="card bg-light m-6">
+    <div class="card-body">
+      <div class="image-container">
+        <img src="{% static 'experiment/image/Pellet.jpg' %}"
+             alt="Pellet Bag" width="240" align="right">
+      </div>
+      <p>
+        Carefully read the instructions, as you will be financially rewarded for
+        your performance.
+      </p>
+      <br>
+
+      <h5>Overview</h5>
+      <p>
+        In this exercise, you will take the role of an employee at
+        {% player.clean_opposite_role %} company
+        that negotiates over bags of pellets.
+      </p>
+      <ul>
+        <li>
+          {% if agent_1 == 'Senior Agent' %}
+            Both companies employ human agents to negotiate over bags of pellets
+          {%else %} 
+            Both companies employ AI Agents and humans to negotiate over bags of
+            pellets
+          {% endif %}
+        </li>
+        <li>
+          The item is produced by the supplying company at a Production Cost
+          (PC) of {% production_costs %}
+        </li>
+        <li>
+          This item is sold by the retailer company at a Retail Price (RP) of
+          {% market_price %}
+        </li>
+        <li>
+          The Retailer and Supplier negotiate via chat on Wholesale Price (w) &
+          Quantity (q)
+        </li>
+        <li>
+          PC & RP are common knowledge and PC is drawn with equal probability.
+        </li>
+        <li>
+          After the negotiation, Demand (D) will be randomly drawn {% demand %}
+          (Equal Probability)
+        </li>
+        <li>
+          Supplier carries the risk of unsold inventory (any q > Demand will
+          expire)
+        </li>
+          {% if agent_1 == 'Senior Agent' %}
+          <li>
+            Your manager will choose to delegate an upcoming negotiation to you
+          </li>
+          <li>
+            You will negotiate and be financially compensated for the outcome
+          </li>
+          {%else %} 
+          <li>
+          Your manager will choose to delegate an upcoming negotiation to you or
+          an AI Agent
+        </li>
+        <li>
+          If the manager delegates it to you, you will negotiate and be financially
+          compensated for the outcome
+        </li>
+        <li>
+          If the manager delegates it to the AI Agent, you will not negotiate
+          and be Idle, but still be financially compensated for the outcome of the AI Agent
+        </li>
+          {% endif %}
+
+
+      </ul>
+      <br>
+
+      <p>
+        For the rest of the experiment, you will be employed by the
+        <strong>{% player.clean_role %}</strong> company.
+      </p>
+
+      <section>
+        <h5>Objective</h5>
+        <p>
+          Your goal is to agree on Wholesale Price (w) and Quantity (q)
+          maximizing your profits.
+        </p>
+      </section>
+      <br>
+
+      <section>
+        <h5>Terms of Negotiation</h5>
+        <ul>
+          <li>
+            <strong>Quantity (q)</strong>
+            Ranges from {% C.DEMAND_MIN %} to {% C.DEMAND_MAX %} without decimals
+          </li>
+          <li>
+            <strong>Wholesale Price (w)</strong>
+            Denoted in euros (€) with two decimals
+          </li>
+        </ul>
+      </section>
+      <br>
+
+      <section>
+        <h5>
+          Roles and Profit Calculation
+        </h5>
+        <div class="card">
+          <div class="card-body">
+            <p>
+              <strong>Supplier Profit</strong> = w * min(q, D) - PC * q<br>
+              <strong>Example:</strong>
+              Your Production Cost (PC) is 4€, and you just agreed with the
+              retailer on a wholesale price (w) of 7€ and a quantity (q) of
+              50:
+            </p>
+            <ul>
+              <li>
+                Demand (D) is 75: 7 * min(50, 75) - 4 * 50 = 150€
+              </li>
+              <li>
+                Demand (D) is 25: 7 * min(50, 25) - 4 * 50 = - 25€
+              </li>
+              <li>
+                Demand (D) is 50: 7 * min(50, 50) - 4 * 50 = 150€
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <p>
+              <strong>Retailer Profit</strong> = RP - w * min (q, D)<br>
+              <strong>Example:</strong>
+              Your Retail Price (RP) is 11€, and you just agreed with the
+              retailer on a wholesale price (w) of 7€ and a quantity (q) of 50:
+            </p>
+
+            <ul>
+              <li>
+                Demand (D) is 75: (11-7) * min(50, 75) = 200€
+              </li>
+              <li>
+                Demand (D) is 25: (11-7) * min(50, 25) = 100€
+              </li>
+              <li>
+                Demand (D) is 50: (11-7) * min(50, 50) = 200€
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <br>
+
+      <h5>Instructions</h5>
+      <ul>
+        {% if agent_1 == 'Senior Agent' %}
+        <li>
+          Your profit from the negotiation divided by 50 determines your
+          financial reward.
+        </li>
+        <li>
+          To warm up, you will have to answer three profit calculation
+          comprehension checks.
+        </li>
+        <li>
+          You will negotiate against another human participant.
+        </li>
+        <li>
+          You have {% timeout %} minutes to reach an agreement. If the time runs
+          out the outcome is an impasse (disagreement), both your profit and
+          your counterpart's profit will be zero.
+        </li>
+        
+
+        {%else %} 
+        <li>
+          If the negotiation is delegated to you, the profit from the
+          negotiation divided by 50 determines your financial reward.<br>
+          If your manager delegates the negotiation to an AI Agent you will
+          still earn the profits from the AI agent divided by 50.
+        </li>
+        <li>
+          To warm up, you will have to answer three profit calculation
+          comprehension checks.
+        </li>
+        <li>
+          You may negotiate against another human participant or with an AI
+          Agent counterpart.
+        </li>
+        <li>
+          You have {% timeout %} minutes to reach an agreement. If the time runs
+          out the outcome is an impasse (disagreement), both your profit and
+          your counterpart's profit will be zero.
+        </li>
+        {% endif %}
+    
+      </ul>
+    </div>
+  </div>
+  <br>
+
+  {% next_button %}
+{% endblock %}

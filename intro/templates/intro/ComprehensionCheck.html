@@ -1,0 +1,40 @@
+{% block title %}
+  Comprehension Check {{ question_number }}/{{ total_questions }}
+{% endblock %}
+
+{% block content %}
+  <h3>
+    {% formfield_errors 'comprehension_check' %}
+  </h3>
+  <br>
+
+  <h5>
+    You are a {% player.role %},
+    {% if player.role == C.ROLE_RETAILER_EMPLOYEE %}
+      the Retail Price is {{ market_price }}.
+    {% else %}
+      your Production Cost is {{ production_cost }}.
+    {% endif %}
+  </h5>
+  <br>
+
+  <h5>
+    You reached a binding agreement during a negotiation on a<br>
+    Wholesale Price (w) of {{ price }} and a Quantity (q) of {{ quantity }}.<br>
+    If after the deal is reached, the Demand is known to be {{ demand }} what is your
+    Profit from that deal?
+  </h5>
+  <br>
+
+  <p>
+    Tip: Check the profit formula in the instructions page
+  </p>
+  <br>
+
+  <input name="comprehension_check" type="number" inputmode="numeric"
+         class="form-control" required="" value=""
+         placeholder="Enter your profit here as a single number">
+  <br>
+
+  {% next_button %}
+{% endblock %}

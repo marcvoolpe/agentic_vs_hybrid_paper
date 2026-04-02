@@ -1,0 +1,79 @@
+{% if not deal_made %}
+  <h3>No Deal Reached</h3>
+  <p>
+    No agreement was reached on time.
+  </p>
+  <p>
+    Your company's profit is <strong>€0</strong>, as no deal was made.
+  </p>
+  <p>
+    You still incurred the base delegation cost of <strong>€{{ base_cost }}</strong>
+    ({% if participant.choice == 'A' %}Human Agent{% else %}AI Agent{% endif %}).
+  </p>
+  <p>
+    Your company's loss: <strong>-€{{ base_cost }}</strong>
+  </p>
+  <p>
+    As financial compensation for participating in this study, you will receive: 
+    <strong>€{{ formatted_final_payment }}</strong>
+  </p>
+{% else %}
+  <h3>Negotiation Results</h3>
+  <p>
+    A final deal was reached at a wholesale price of <strong>€{{ formatted_deal_price }}</strong> 
+    for <strong>{{ formatted_deal_quantity }} units</strong>.
+  </p>
+  <p>
+    The realized demand was <strong>{{ group.demand }} units</strong>.
+  </p>
+  
+  <h3>Cost Breakdown</h3>
+  <p>
+    <strong>Product Class:</strong> {{ group.class_name }}
+  </p>
+  <p>
+    <strong>Your Delegation Choice:</strong> {% if participant.choice == 'A' %}Human Agent{% else %}AI Agent{% endif %}
+  </p>
+  <p>
+    <strong>Counterpart's Delegation Choice:</strong> {% if other_manager_choice == 'A' %}Human Agent{% else %}AI Agent{% endif %}
+  </p>
+  <p>
+    <strong>Base Delegation Cost:</strong> €{{ base_cost }}
+  </p>
+  <p>
+    <strong>Transaction Cost:</strong> €{{ transaction_cost }}
+  </p>
+  <p>
+    <strong>Bonus to Delegee:</strong> €{{ bonus_delegee }}
+  </p>
+  <p>
+    <strong>Total Delegation Cost:</strong> €{{ delegation_cost }}
+  </p>
+  
+  <h3>Company Performance</h3>
+  <p>
+    <strong>Profit from Deal:</strong> €{{ formatted_profit }}
+  </p>
+  <p>
+    <strong>Company Profit:</strong> €{{ company_profit }}<br>
+    <em>(Profit from Deal - Delegation Cost - Bonus Delegee)</em>
+  </p>
+  
+  <h3>Your Compensation</h3>
+  <p>
+    You received <strong>2.5%</strong> of the company's profits as your bonus.
+  </p>
+  <p>
+    Your payment: <strong>€{{ formatted_final_payment }}</strong>
+  </p>
+  <br>
+  <p>
+    <strong>Please remember this amount: €{{ formatted_final_payment }}</strong><br>
+    You will need to enter it when filling in your payment information.<br>
+    If you enter an incorrect amount, we will not be able to process your financial compensation.
+  </p>
+  <a href="https://forms.office.com/e/SXyc0rqK6J" target="_blank" class="btn btn-primary">
+    Fill in your bank details
+  </a>
+{% endif %}
+

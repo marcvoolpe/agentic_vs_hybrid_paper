@@ -1,0 +1,15 @@
+{% block title %}
+  Results
+{% endblock %}
+
+{% block content %}
+  {% if player.is_management %}
+    {% include 'experiment/Results.manager.html' %}
+  {% else %}
+    {% include 'experiment/Results.employee.html' %}
+  {% endif %}
+
+  <p>
+    Thank you for participating!
+  </p>
+{% endblock %}

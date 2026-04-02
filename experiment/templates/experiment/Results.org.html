@@ -1,0 +1,88 @@
+{% block title %}
+  Results
+{% endblock %}
+
+{% block content %}
+  {%  %}
+
+
+
+
+  {% if player.is_single == 1 %}
+    {% if not formatted_deal_price %}
+      <p>
+        Sorry, you haven't reached an agreement on time.
+      </p>
+    {% else %}
+      <p>
+        The demand was {% formatted_demand %}.
+      </p>
+      <p>
+        Congratulations, you made your final deal at the price
+        of {% formatted_deal_price %} for {% formatted_deal_quantity %} units,
+        that translates to profits
+        of {% formatted_profits %}.
+      </p>
+    {% endif %}
+
+    <p>
+      As financial compensation for participating in this study, you will
+      receive your average profit (divided over 50) of
+      <strong>{% formatted_final_payment %}</strong>.
+    </p>
+
+    <p>
+      Remember this amount <strong>{% formatted_final_payment %} </strong>
+      when you are asked to enter your payment information.<br>
+      If you enter an incorrect amount in the form, we will not be able to
+      process your financial compensation.
+    </p>
+
+    <a href=https://forms.office.com/e/SXyc0rqK6J>Fill in your bank
+      details</a>
+
+  {% else %}
+    {% if not formatted_deal_price %}
+      <p>
+        Sorry, you haven't reached an agreement on time.
+      </p>
+    {% else %}
+      <p>
+        The demand was {% formatted_demand %}.
+      </p>
+      <p>
+        Congratulations, you made your final deal at the price
+        of {% formatted_deal_price %} for {% formatted_deal_quantity %} units,
+        that translates to profits
+        of {% formatted_profits %}.
+      </p>
+    {% endif %}
+
+    <p>
+      Your average profits are: Your Cumulative Profits
+      of {% formatted_cumulative_score %} divided by the number of
+      rounds you negotiated. That is {% formatted_AVG_human_profit %}
+    </p>
+    <p>
+      As financial compensation for participating in this study, you will
+      receive your average profits
+      across the non-practice rounds (divided over 50) of
+      <strong>{% formatted_final_payment %}</strong>.
+    </p>
+
+    <p>
+      Remember this amount <strong>{% formatted_final_payment %} </strong>
+      when you are asked to enter your payment information.
+      If you enter an incorrect amount in the form, we will not be able to
+      process your financial compensation.
+    </p>
+
+    <a href=https://forms.office.com/e/SXyc0rqK6J>Fill in your bank
+      details</a>
+
+  {% endif %}
+
+  <p>
+    Thank you for participating!
+  </p>
+{% endblock %}

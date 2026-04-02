@@ -1,0 +1,94 @@
+{% block title %}Make Your Delegation Decision{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Delegation Decision - {% player.clean_role %}</h4>
+
+      <div class="alert alert-info">
+        <strong>Your assigned Product Class:</strong> {{ product_class }}
+        <br>
+        <strong>Retail Price (RP):</strong> 11€
+        <br>
+        <strong>Production Cost (PC):</strong> 
+        {% if product_class == 'A' %}
+          3€
+        {% elif product_class == 'B' %}
+          4€
+        {% elif product_class == 'C' %}
+          5€
+        {% endif %}
+        <br>
+        <strong>Transaction Cost (TC):</strong> 
+        {% if product_class == 'A' %}
+          50€
+        {% elif product_class == 'B' %}
+          40€
+        {% elif product_class == 'C' %}
+          30€
+        {% endif %}
+      </div>
+
+      <div class="alert alert-success">
+        <strong>The {% player.clean_opposite_role %} has chosen:</strong>
+        {% choice_display %} (Option {% first_choice %})
+      </div>
+
+      <p>
+        As the <strong>{% player.clean_role %}</strong>, you now need to decide
+        whether to delegate the upcoming negotiation to:
+      </p>
+      <ul>
+        <li>
+          <strong>Option A - {% agent_1 %}:</strong>
+          Base cost 20, potential for relationship building.
+        </li>
+        <li>
+          <strong>Option B - {% agent_2 %}:</strong>
+          Base cost 10, focused on transactional efficiency.
+        </li>
+      </ul>
+
+      <p>
+        <strong>Consider:</strong>
+      </p>
+      <ul>
+        <li>
+          If you both choose {% agent_1 %} (A),
+          there's a 50% chance of halving transaction costs through relationship building.
+        </li>
+        <li>
+          If the counterpart chose {% agent_2 %} (B),
+          your transaction costs are certain.
+        </li>
+      </ul>
+
+      <div class="mb-3 _formfield">
+        <label class="col-form-label" for="id_{% role_lower %}_choice">
+          Your delegation decision:
+        </label>
+        <div class="controls">
+          <div id="id_{% role_lower %}_choice" required="">
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     id="id_{% role_lower %}_choice-0"
+                     name="{% role_lower %}_choice" required=""
+                     value="{% option_0 %}">
+              <label for="id_{% role_lower %}_choice-0">{% agent_1 %}</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     id="id_{% role_lower %}_choice-1"
+                     name="{% role_lower %}_choice" required=""
+                     value="{% option_1 %}">
+              <label for="id_{% role_lower %}_choice-1">{% agent_2 %}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  {% next_button %}
+{% endblock %}

@@ -3,7 +3,6 @@ import re
 import logging
 from typing import Any
 
-import httpx
 import spacy
 from ollama import AsyncClient, ChatResponse
 from otree.channels import utils as channel_utils

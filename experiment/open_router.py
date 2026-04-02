@@ -1,3 +1,5 @@
+import httpx
+
 class _AttrDict(dict):
                     def __getattr__(self, item):
                         try:

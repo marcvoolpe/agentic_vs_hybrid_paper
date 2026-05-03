@@ -1,4 +1,4 @@
-from agentic_vs_hybrid.common import RoleConstants
+from common import RoleConstants
 
 
 class C(RoleConstants):

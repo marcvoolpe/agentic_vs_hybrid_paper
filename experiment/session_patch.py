@@ -68,7 +68,7 @@ class SessionPatch:
         if not llm_hosts:
             raise NoServersException("\n\nNo LLM hosts available!\n")
 
-        from agentic_vs_hybrid.experiment import log_debug
+        from .utils import log_debug
         for llm_host in llm_hosts:
             log_debug(f"HOST {llm_host}")
 

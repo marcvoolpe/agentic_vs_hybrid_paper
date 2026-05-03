@@ -87,7 +87,7 @@ class Group(BaseGroup):
         else:
             # Only for development
             assert 'intro' not in self.session.config['app_sequence']
-            from agentic_vs_hybrid.intro.models import Subsession as IntroSubsession
+            from intro.models import Subsession as IntroSubsession
             available_classes = get_active_classes(self.session.config)
             class_dict = IntroSubsession.select_random_class(available_classes)
             class_name = class_dict['class_name']

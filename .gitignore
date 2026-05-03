@@ -15,3 +15,6 @@ secret.py
 settings.json
 **/functions.log
 notebooks
+
+pixi.toml
+pixi.lock

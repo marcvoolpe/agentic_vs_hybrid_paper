@@ -15,6 +15,7 @@ secret.py
 settings.json
 **/functions.log
 notebooks
-
+mock
+persona_scripts
 pixi.toml
 pixi.lock

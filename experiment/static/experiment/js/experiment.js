@@ -31,13 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnAccept.disabled = false;
   }
 
-  // Set the timer color to red if 30 seconds left
-  $('.otree-timer__time-left').on('update.countdown', function (event) {
-    if (event.offset.totalSeconds <= 30) {
-      document.getElementsByClassName('time-left')[0].style.color = "#FF0000";
-    }
-  });
-
   setInterval(() => {
     liveSend({'type': 'ping'});
   }, 1000);

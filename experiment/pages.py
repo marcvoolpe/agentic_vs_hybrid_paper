@@ -2,7 +2,6 @@ from typing import Any
 
 from otree.api import *
 
-from .constants import C
 from .models import Player, Group
 from .optimal import OPTIMAL_OFFER
 from .utils import now_datetime
@@ -18,10 +17,6 @@ class Experiment(Page):
     @staticmethod
     def is_displayed(player: Player) -> bool:
         return player.is_active
-
-    @staticmethod
-    def get_timeout_seconds(player: Player) -> int:
-        return player.session.config['timeout_experiment']
 
     @staticmethod
     def get_formatted_optimal_offer(player: Player) -> str:
@@ -97,40 +92,13 @@ class Results(Page):
 
     @classmethod
     def vars_for_template(cls, player: Player) -> dict[str, Any]:
-        if player.is_management:
-            # For managers, get the employee's deal information
-            employee = player.employee_player
-            price, quantity, profit, payoff = cls.get_params(employee)
-            
-            # Get the other manager to check their choice
-            if player.role == C.ROLE_RETAILER_MANAGER:
-                other_manager = player.group.get_player_by_role(C.ROLE_SUPPLIER_MANAGER)
-            else:
-                other_manager = player.group.get_player_by_role(C.ROLE_RETAILER_MANAGER)
-            
-            # Use the stored values from calculate_profits_manager
-            return {
-                'formatted_deal_price': price,
-                'formatted_deal_quantity': quantity,
-                'formatted_profit': profit,  # Employee's deal profit
-                'formatted_final_payment': f"{player.payoff:.2f}",
-                'transaction_cost': f"{player.transaction_cost:.2f}",
-                'base_cost': f"{player.base_cost:.2f}",
-                'bonus_delegee': f"{player.bonus_delegee:.2f}",
-                'delegation_cost': f"{player.delegation_cost:.2f}",
-                'company_profit': f"{player.company_profit:.2f}",
-                'other_manager_choice': other_manager.participant.choice,
-                'deal_made': employee.price_accepted is not None,
-            }
-        else:
-            # For employees, use their own data
-            price, quantity, profit, payoff = cls.get_params(player)
-            return {
-                'formatted_deal_price': price,
-                'formatted_deal_quantity': quantity,
-                'formatted_profit': profit,
-                'formatted_final_payment': payoff,
-            }
+        price, quantity, profit, payoff = cls.get_params(player)
+        return {
+            'formatted_deal_price': price,
+            'formatted_deal_quantity': quantity,
+            'formatted_profit': profit,
+            'formatted_final_payment': payoff,
+        }
 
 
 

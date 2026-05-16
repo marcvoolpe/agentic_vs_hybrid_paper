@@ -6,7 +6,8 @@ from typing import Any, Union
 from otree.api import *
 
 from common import JsonField, RoleUtils, employee_retailer_profit, \
-    employee_supplier_profit, ROOM_CONFIGS, CLASS_DICT
+    employee_supplier_profit, ROOM_CONFIGS, AGENT_ROOM_CONFIGS, CLASS_DICT, \
+    get_room_config, normalize_room_id
 from settings import get_active_classes
 
 from .bot_negotiation import NegotiationBot
@@ -30,11 +31,14 @@ class Subsession(BaseSubsession):
         assert config['market_price_high'] > config['market_price_low']
         assert config['production_cost_high'] > config['production_cost_low']
         assert config['demand_max'] > config['demand_min']
-        assert config['room'] in range(-1, 13)
-        if config['room'] in range(1, 13):
-            room = ROOM_CONFIGS[config['room']]
-            assert room['first'] in (C.ROLE_SUPPLIER_EMPLOYEE,
-                                     C.ROLE_RETAILER_EMPLOYEE)
+        room_id = normalize_room_id(config['room'])
+        assert room_id == -1 or room_id in ROOM_CONFIGS or room_id in AGENT_ROOM_CONFIGS
+        if room_id != -1:
+            room = get_room_config(room_id)
+            assert room['first'] in (
+                C.ROLE_SUPPLIER_EMPLOYEE,
+                C.ROLE_RETAILER_EMPLOYEE,
+            )
             assert room['product_class'] in CLASS_DICT.keys()
 
 
@@ -61,6 +65,9 @@ class Group(BaseGroup):
     demand = models.IntegerField()
     optimal_offer = JsonField(initial={})
     class_name = models.StringField()
+    target_profit = models.FloatField()
+    human_expected_profit = models.FloatField()
+    bot_expected_profit = models.FloatField()
 
     def both_human_or_senior(self) -> bool:
         return self.retailer_choice == self.supplier_choice == C.HUMAN_SENIOR
@@ -77,28 +84,36 @@ class Group(BaseGroup):
         return formatted_optimal_offer
 
     def initialize_group(self, demand_min: int, demand_max: int):
-        # Retrieve the selected class from session.vars (set by intro app)
-        group_class_data = self.subsession.session.vars. \
-            get('group_classes', {}).get(self.id_in_subsession)
+        room_id = normalize_room_id(self.session.config['room'])
+        room = get_room_config(room_id)
 
-        if group_class_data:
-            class_name = group_class_data['class_name']
-            class_params = group_class_data['class_params']
+        if room:
+            class_name = room['product_class']
+            class_params = CLASS_DICT[class_name]
+            session_config = dict(self.session.config)
+            session_config['baseline'] = room.get(
+                'baseline', session_config['baseline']
+            )
+            if 'full_agent' in room:
+                session_config['full_agent'] = room['full_agent']
+            if 'agentic_evaluation_help' in room:
+                session_config['agentic_evaluation_help'] = room[
+                    'agentic_evaluation_help']
+            session_config['room'] = room_id
+            self.session.config = session_config
+            human_role = room['first']
         else:
-            # Only for development
-            assert 'intro' not in self.session.config['app_sequence']
-            from intro.models import Subsession as IntroSubsession
             available_classes = get_active_classes(self.session.config)
-            class_dict = IntroSubsession.select_random_class(available_classes)
-            class_name = class_dict['class_name']
-            class_params = class_dict['class_params']
-            group_classes = self.session.vars['group_classes'] = {}
-            group_classes[self.id_in_subsession] = class_dict
+            class_name = random.choice(list(available_classes.keys()))
+            class_params = available_classes[class_name]
+            # Default to retailer when no room is configured.
+            human_role = C.ROLE_RETAILER_EMPLOYEE
 
-            self.retailer_choice = random.choice([C.HUMAN_SENIOR, C.AI_JUNIOR])
-            self.supplier_choice = random.choice([C.HUMAN_SENIOR, C.AI_JUNIOR])
-            self.get_players()[0].participant.choice = self.retailer_choice
-            self.get_players()[1].participant.choice = self.supplier_choice
+        group_classes = self.session.vars.setdefault('group_classes', {})
+        group_classes[self.id_in_subsession] = {
+            'class_name': class_name,
+            'class_params': class_params,
+        }
 
         self.class_name = class_name
         self.market_price = class_params['market_price']
@@ -110,59 +125,35 @@ class Group(BaseGroup):
             self.optimal_offer = nash_bargaining_solution(self.market_price,
                                                           self.production_cost)
 
-        for player in self.get_players():
-            player._role = C.ROLES[player.id_in_group - 1]
-            player.participant.role = player.role
+        player = self.get_player_by_id(1)
+        player._role = human_role
+        player.participant.role = player.role
+        # Keep participant.choice populated for downstream payoff logic.
+        player.participant.choice = C.AI_JUNIOR
 
     def set_opponents(self):
-        retailer_manager = self.get_player_by_role(C.ROLE_RETAILER_MANAGER)
-        supplier_manager = self.get_player_by_role(C.ROLE_SUPPLIER_MANAGER)
-        retailer_employee = self.get_player_by_role(C.ROLE_RETAILER_EMPLOYEE)
-        supplier_employee = self.get_player_by_role(C.ROLE_SUPPLIER_EMPLOYEE)
+        player = self.get_player_by_id(1)
+        player.other_id = -1
+        player.is_active = True
 
-        self.retailer_choice = retailer_manager.participant.choice
-        self.supplier_choice = supplier_manager.participant.choice
-
-        is_baseline = self.session.config['baseline'] == True
-        if is_baseline or self.both_human_or_senior():
-            # Only Human-Human if both managers chose Human (or baseline)
-            retailer_employee.other_id = supplier_employee.id_in_group
-            supplier_employee.other_id = retailer_employee.id_in_group
-            retailer_employee.is_active = supplier_employee.is_active = True
-        elif self.both_ai_or_junior():
-            # Both managers chose AI, nothing to do for anyone
-            pass
-        else:
-            # If manager chose AI for the employee: negotiate with bot
-            retailer_employee.is_active = (self.retailer_choice == C.AI_JUNIOR)
-            supplier_employee.is_active = (self.supplier_choice == C.AI_JUNIOR)
+    def record_deal_expected_profits(self, human_player: 'Player'):
+        price = human_player.price_accepted
+        quantity = human_player.quantity_accepted
+        offer = Offer(price=price, quantity=quantity)
+        bot_role = (C.ROLE_SUPPLIER_EMPLOYEE if human_player.is_retailer
+                    else C.ROLE_RETAILER_EMPLOYEE)
+        offer.profits(bot_role, self.market_price, self.production_cost)
+        self.target_profit = self.optimal_offer['profit']
+        self.human_expected_profit = offer.profit_user
+        self.bot_expected_profit = offer.profit_bot
 
     def set_payoff(self):
-        retailer_employee = self.get_player_by_role(C.ROLE_RETAILER_EMPLOYEE)
-        supplier_employee = self.get_player_by_role(C.ROLE_SUPPLIER_EMPLOYEE)
-        retailer_manager = self.get_player_by_role(C.ROLE_RETAILER_MANAGER)
-        supplier_manager = self.get_player_by_role(C.ROLE_SUPPLIER_MANAGER)
-
-        # Both managers chose AI -> use Nash equilibrium
-        if retailer_employee.is_active == supplier_employee.is_active == False:
-            nash_price, nash_quantity = self.optimal_offer['offer']
-            retailer_employee.price_accepted = nash_price
-            retailer_employee.quantity_accepted = nash_quantity
-            supplier_employee.price_accepted = nash_price
-            supplier_employee.quantity_accepted = nash_quantity
-
-        # Employees
-        for employee in [retailer_employee, supplier_employee]:
-            price_accepted = employee.field_maybe_none('price_accepted')
-            quantity_accepted = employee.field_maybe_none('quantity_accepted')
-            if price_accepted is not None and quantity_accepted is not None:
-                employee.set_profit_payoff()
-
-        # Managers: set payoff if their employee has a deal
-        if retailer_employee.field_maybe_none('price_accepted') is not None and retailer_employee.field_maybe_none('quantity_accepted') is not None:
-            retailer_manager.set_profit_payoff()
-        if supplier_employee.field_maybe_none('price_accepted') is not None and supplier_employee.field_maybe_none('quantity_accepted') is not None:
-            supplier_manager.set_profit_payoff()
+        player = self.get_player_by_id(1)
+        price_accepted = player.field_maybe_none('price_accepted')
+        quantity_accepted = player.field_maybe_none('quantity_accepted')
+        if price_accepted is not None and quantity_accepted is not None:
+            self.record_deal_expected_profits(player)
+            player.set_profit_payoff()
 
 
 class Player(BasePlayer, RoleUtils):
@@ -254,11 +245,6 @@ class Player(BasePlayer, RoleUtils):
             self.time_end = now_datetime()
             self.price_accepted = price
             self.quantity_accepted = quantity
-            # Defensive: only set idle_player if it exists
-            if hasattr(self, 'idle_player') and self.idle_player is not None:
-                self.idle_player.price_accepted = price
-                self.idle_player.quantity_accepted = quantity
-                print(f"[DEBUG] process_accept (bot): idle_player={self.idle_player.role}, price_accepted={self.idle_player.price_accepted}, quantity_accepted={self.idle_player.quantity_accepted}")
             print(f"[DEBUG] process_accept (bot): self={self.role}, price_accepted={self.price_accepted}, quantity_accepted={self.quantity_accepted}")
 
     def process_chat(self, data: dict[str, Any]) -> dict[int, Any]:

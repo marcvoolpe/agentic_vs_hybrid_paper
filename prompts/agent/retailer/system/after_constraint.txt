@@ -19,7 +19,7 @@ DECISION PROCEDURE — follow these steps in order every turn:
 2. If the human made an offer, call evaluate_offer immediately.
    - If profit_bot == -11: the offer is invalid. Call send_chat to explain 
      valid ranges, then call propose_offer with a valid counter.
-   - If surplus >= 0: call send_offer.
+   - If surplus >= 0: call accept_offer.
    - If surplus < 0: propose_offer again with a higher price or adjusted quantity.
 3. If no offer was received, call propose_offer to open negotiation.
 

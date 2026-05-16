@@ -53,12 +53,18 @@ class BotTask:
     def callback_handler(task: asyncio.Task):
         from .session_patch import Queues
 
-        # Release the LLM host
-        async def release():
-            await Queues.release(
-                data['session_code'], data['round_number'], data['llm_host'])
+        if task.exception():
+            print(f"\nBot task failed:\n{task.exception()}\n")
 
         data = json.loads(task.get_name())
+        llm_host = data.get('llm_host')
+        if not llm_host:
+            return
+
+        async def release():
+            await Queues.release(
+                data['session_code'], data['round_number'], llm_host)
+
         asyncio.create_task(release())
 
     async def start_task(self, coro: Callable):

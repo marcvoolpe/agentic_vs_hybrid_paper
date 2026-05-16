@@ -70,7 +70,7 @@ TOOLS = [
         "name": "send_offer",
         "description": "Send the chosen proposed offer to the human negotiator via the interface and the chat. "
                     "Call this only after calling propose_offer and the chosen pending offer meets your target. "
-                    "NEVER use this tool if the chosen offer evaluation yields negaive surplus."
+                    "NEVER use this tool if the chosen offer evaluation yields negative surplus."
                     "Once sent, the negotiator can officially accept or counter. ",
         "parameters": {
             "type": "object",
@@ -84,7 +84,7 @@ TOOLS = [
                     "description": "message that contains the terms of the offer along with a brief explanation based on the context."
                 } 
             },
-            "required": ["offer_number", "messaage"]
+            "required": ["offer_number", "message"]
         }
     }
 },
@@ -93,7 +93,7 @@ TOOLS = [
     "function": {
         "name": "accept_offer",
         "description": "Accept the last offer from the human negotiator. "
-                    "NEVER use this tool if the last offer evaluation yields negaive surplus."
+                    "NEVER use this tool if the last offer evaluation yields negative surplus."
                     "This is irreversible — the negotiation ends immediately and "
                     "profits are computed. "
                     "IMPORTANT: You MUST call evaluate_offer first to confirm the "
@@ -127,8 +127,7 @@ TOOLS = [
                     "description": "Quantity to evaluate. Omit to evaluate last received offer."
                 }
             },
-            "required": []  #if passed, the llm is evaluating its offer to send, otherwise it's received
-            # TODO: what happens if the human sends offer in the chat but the llm does not pass the argumentss
+            "required": []  #if passed, the llm is evaluating its own offer to send, otherwise it's received
         }
     }
 },
@@ -166,7 +165,7 @@ TOOLS = [
                        "Returns the optimal price, quantity, and profit. "
                        "The Nash profit is your minimum acceptable profit threshold — "
                        "any deal where your profit falls below this should be rejected. "
-                       "Use this when you need a reference point to evaluate offers.",
+                       "Use this when you need a reference point to evaluate or propose offers.",
         "parameters": {
             "type": "object",
             "properties": {}
@@ -174,18 +173,21 @@ TOOLS = [
     }
 }]
 
-def numeric_offer_evaluation(price: float,  quantity: int, role: str,
-                            constraint_user: int, constraint_bot: int):
-    
+def numeric_offer_evaluation(price: float, quantity: int, role: str,
+                            constraint_user: int, constraint_bot: int,
+                            include_profitable: bool = True):
     offer = Offer(price=price, quantity=quantity)
-    offer.profits(bot_role=role, constraint_user=constraint_user, constraint_bot=constraint_bot)
+    offer.profits(bot_role=role, constraint_user=constraint_user,
+                  constraint_bot=constraint_bot)
 
-    target = nash_bargaining_solution(constraint_bot=constraint_user, constraint_user=constraint_bot)['profit']
+    target = nash_bargaining_solution(constraint_user, constraint_bot)['profit']
 
-    return {
+    result = {
         'profit_bot': offer.profit_bot,
         'profit_user': offer.profit_user,
         'target_profit': target,
-        'surplus': round(offer.profit_bot - target, 2), # not essential, big help to the llm
-        'profitable': False if (offer.profit_bot - target < 0) else True
+        'surplus': round(offer.profit_bot - target, 2),
     }
+    if include_profitable:
+        result['profitable'] = offer.profit_bot - target >= 0
+    return result

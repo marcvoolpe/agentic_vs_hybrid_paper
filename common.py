@@ -73,7 +73,7 @@ class RoleUtils:
 
     @property
     def is_first_mover(self) -> bool:
-        return self.role == self.session.first_mover_role
+        return self.role == getattr(self.session, 'first_mover_role', None)
 
     @property
     def is_supplier(self) -> bool:
@@ -85,14 +85,22 @@ class RoleUtils:
 
     @property
     def opposite_id(self):
-        if self.id_in_group < 3:
-            return 1 + (self.id_in_group == 1)
-        else:
-            return 3 + (self.id_in_group == 3)
+        opposite_role = self.opposite_role
+        return RoleConstants.ROLES.index(opposite_role) + 1
 
     @property
     def opposite_role(self) -> str:
-        return RoleConstants.ROLES[self.opposite_id - 1]
+        opposites = {
+            RoleConstants.ROLE_RETAILER_MANAGER:
+                RoleConstants.ROLE_SUPPLIER_MANAGER,
+            RoleConstants.ROLE_SUPPLIER_MANAGER:
+                RoleConstants.ROLE_RETAILER_MANAGER,
+            RoleConstants.ROLE_RETAILER_EMPLOYEE:
+                RoleConstants.ROLE_SUPPLIER_EMPLOYEE,
+            RoleConstants.ROLE_SUPPLIER_EMPLOYEE:
+                RoleConstants.ROLE_RETAILER_EMPLOYEE,
+        }
+        return opposites[self.role]
 
     @property
     def clean_role(self) -> str:
@@ -106,6 +114,9 @@ class RoleUtils:
     def idle_player(self) -> 'Player':
         assert self.role in RoleConstants.ROLES_EMPLOYEE
         idle_id = 3 if self.id_in_group == 4 else 4
+        players = self.group.get_players()
+        if idle_id > len(players):
+            return None
         return self.group.get_player_by_id(idle_id)
 
     @property
@@ -155,6 +166,45 @@ ROOM_CONFIGS = {
     12: {'product_class': CLASS_A,
          'first': RC.ROLE_RETAILER_EMPLOYEE, 'baseline': True},
 }
+
+AGENT_ROOM_CONFIGS = {
+    101: {'product_class': CLASS_B,
+          'first': RC.ROLE_RETAILER_EMPLOYEE, 'baseline': True,
+          'full_agent': True, 'agentic_evaluation_help': False},
+    102: {'product_class': CLASS_B,
+          'first': RC.ROLE_SUPPLIER_EMPLOYEE, 'baseline': True,
+          'full_agent': True, 'agentic_evaluation_help': False},
+    103: {'product_class': CLASS_B,
+          'first': RC.ROLE_RETAILER_EMPLOYEE, 'baseline': True,
+          'full_agent': True, 'agentic_evaluation_help': True},
+    104: {'product_class': CLASS_B,
+          'first': RC.ROLE_SUPPLIER_EMPLOYEE, 'baseline': True,
+          'full_agent': True, 'agentic_evaluation_help': True},
+    105: {'product_class': CLASS_B,
+          'first': RC.ROLE_RETAILER_EMPLOYEE, 'baseline': True,
+          'full_agent': False},
+    106: {'product_class': CLASS_B,
+          'first': RC.ROLE_SUPPLIER_EMPLOYEE, 'baseline': True,
+          'full_agent': False},
+}
+
+ROOM_ID_ALIASES = {
+    'agentic_retailer_no_help': 101,
+    'agentic_supplier_no_help': 102,
+    'agentic_retailer_help': 103,
+    'agentic_supplier_help': 104,
+    'hybrid_retailer': 105,
+    'hybrid_supplier': 106,
+}
+
+
+def normalize_room_id(room_id):
+    return ROOM_ID_ALIASES.get(room_id, room_id)
+
+
+def get_room_config(room_id):
+    room_id = normalize_room_id(room_id)
+    return AGENT_ROOM_CONFIGS.get(room_id, ROOM_CONFIGS.get(room_id))
 
 
 def employee_retailer_profit(market_price: float, price: float,

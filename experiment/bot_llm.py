@@ -3,6 +3,7 @@ import re
 import logging
 from typing import Any
 
+import httpx
 import spacy
 from ollama import AsyncClient, ChatResponse
 from otree.channels import utils as channel_utils
@@ -15,6 +16,35 @@ from .utils import log_debug, log_interpret
 
 NLP = spacy.load("en_core_web_sm")
 PATTERN_OFFER = re.compile(r'\[([^]]+)]')
+
+_VALID_LLM_PROVIDERS = frozenset({'cerebras', 'openrouter'})
+_LOG = logging.getLogger(__name__)
+
+
+def _normalize_llm_provider(raw) -> str | None:
+    """Return canonical provider name, or None if missing/invalid."""
+    if raw is None:
+        return None
+    s = str(raw).strip().lower()
+    if s in _VALID_LLM_PROVIDERS:
+        return s
+    return None
+
+
+class _AttrDict(dict):
+    def __getattr__(self, item):
+        try:
+            return self[item]
+        except KeyError as err:
+            raise AttributeError(item) from err
+
+
+def _to_attrdict(value):
+    if isinstance(value, dict):
+        return _AttrDict({k: _to_attrdict(v) for k, v in value.items()})
+    if isinstance(value, list):
+        return [_to_attrdict(v) for v in value]
+    return value
 
 
 class BotLLM:
@@ -139,23 +169,64 @@ class BotLLM:
     ############################################################################
     # Methods that use the LLMs
     ############################################################################
+    def _is_agentic_session(self) -> bool:
+        return bool(self.config.get('full_agent', False))
+
     def _ensure_client(self):
         if self.client is None:
-            api_key = self.config['llm_api_key']
-            llm_model = str(self.config.get('llm_model', ''))
+            if not self._is_agentic_session():
+                logging.getLogger("httpx").level = logging.WARNING
+                auth = httpx.BasicAuth(username=self.config['llm_user'],
+                                       password=self.config['llm_pass'])
+                self.client = AsyncClient(host=self.config['llm_host'],
+                                          auth=auth)
+                return
 
-            if api_key.startswith('sk-or-v1-') or '/' in llm_model:
+            raw_provider = self.config.get('llm_provider')
+            provider = _normalize_llm_provider(raw_provider)
+            if provider is None:
+                if raw_provider in (None, ''):
+                    _LOG.warning(
+                        'llm_provider missing in session config; defaulting to '
+                        '"openrouter". Set llm_provider in settings or session config.'
+                    )
+                else:
+                    _LOG.warning(
+                        'Invalid llm_provider %r; defaulting to "openrouter". '
+                        'Use "openrouter" or "cerebras".',
+                        raw_provider,
+                    )
+                provider = 'openrouter'
+
+            api_key = (self.config.get('llm_api_key') or '').strip()
+            if not api_key:
+                # Backward-compatible fallback (deprecated; see experiment/secret.py).
+                from . import secret
+                if provider == 'cerebras':
+                    api_key = (getattr(secret, 'CEREBRAS_API_KEY', None) or '').strip()
+                else:
+                    api_key = (getattr(secret, 'OPEN_ROUTER_API_KEY', None) or '').strip()
+
+            if not api_key:
+                env_hint = (
+                    'CEREBRAS_API_KEY or LLM_API_KEY'
+                    if provider == 'cerebras'
+                    else 'OPENROUTER_API_KEY, OPEN_ROUTER_API_KEY, or LLM_API_KEY'
+                )
+                raise RuntimeError(
+                    f"Missing API key for llm_provider={provider!r}. "
+                    f"Set session config llm_api_key or environment variable {env_hint}."
+                )
+
+            if provider == 'openrouter':
                 from .open_router import OpenRouterClient
                 self.client = OpenRouterClient(api_key)
                 return
-        
+
             from cerebras.cloud.sdk import Cerebras
-            self.client = Cerebras(
-                api_key=self.config['llm_api_key']
-            )
+            self.client = Cerebras(api_key=api_key)
 
     async def get_llm_response(self, content: str) -> ChatResponse:
-        # Ensure we have a client
         self._ensure_client()
 
         assert isinstance(content, str)
@@ -163,14 +234,28 @@ class BotLLM:
         messages = [{"role": "system", "content": system_prompt},
                     {"role": "user", "content": content}]
 
-        await asyncio.to_thread(
+        if not self._is_agentic_session():
+            response = await self.client.chat(
+                model=self.config['llm_model'],
+                options={'temperature': self.config['llm_temp']},
+                messages=messages)
+            if isinstance(response, dict):
+                return _to_attrdict(response)
+            return response
+
+        response = await asyncio.to_thread(
             self.client.chat.completions.create,
             model=self.config['llm_model'],
             messages=messages,
             temperature=self.config['llm_temp'],
         )
+        content = response.choices[0].message.content or ''
+        return _to_attrdict({'message': {'content': content}})
     
     async def get_llm_response_with_tools(self, messages: list, tools: list):
+        if not self._is_agentic_session():
+            raise RuntimeError(
+                "Tool calling is only supported for agentic (full_agent) sessions.")
         self._ensure_client()
 
         # asyncio.to_thread runs the blocking Cerebras SDK call in a
@@ -206,9 +291,6 @@ class BotLLM:
 
     async def _interpret_offer_llm(self, message: str,
                                    idx: int = None) -> Offer:
-        # Ensure we have a client
-        self._ensure_client()
-
         # Defaults to User Offer
         if idx is None:
             idx = self.config['idx']
@@ -217,9 +299,10 @@ class BotLLM:
             # If a message contains at least one number -> let LLM interpret
             messages = [{'role': 'user',
                          'content': HYBRID_PROMPTS['understanding_offer'] + message}]
-            # Make the call
-            response = await self.client.chat(model=self.config['llm_reader'],
-                                              messages=messages)
+            self._ensure_client()
+            response = await self.client.chat(
+                model=self.config['llm_reader'],
+                messages=messages)
             llm_output = response['message']['content']
         else:
             # Otherwise, output an empty offer [,] directly

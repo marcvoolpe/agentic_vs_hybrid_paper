@@ -2,6 +2,7 @@ import copy
 import asyncio
 import sys
 import json
+from typing import Callable
 
 from ollama import ChatResponse
 
@@ -67,6 +68,31 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         self._offers_interactions()
         asyncio.ensure_future(self.start_task(self._run_offer))
 
+    async def start_task(self, coro: Callable):
+        """Agentic bot uses Cerebras API; do not block on Ollama host queue."""
+        log_function(__class__, sys._getframe().f_code.co_name)
+
+        self.ensure_exception_handler()
+        data = {'llm_host': None,
+                'group_name': self.config['group_name'],
+                'session_code': self.config['session_code'],
+                'round_number': self.config['round_number']}
+        task = asyncio.create_task(coro())
+        task.set_name(json.dumps(data))
+        task.add_done_callback(self.callback_handler)
+
+    def _offers_interactions(self):
+        # TODO: move to BotBase - shared with NegotiationBot
+        log_function(__class__, sys._getframe().f_code.co_name)
+
+        self.offer_list = OfferList(
+            Offer(**offer) for offer in self.player.offers)
+
+        assert isinstance(self.player.llm_interactions, list)
+        self.interaction_list = InteractionList(self.player.llm_interactions)
+        self.interaction_list.add_user_message(self.user_message)
+        self.player.llm_interactions = self.interaction_list
+
     async def _run_initial(self):
         await self._run_loop("Start the negotiation with an opening message.")
 
@@ -127,7 +153,6 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
                 if tool_name not in ACTION_TOOLS:
                     print(f"  [loop step {step}] tool result for '{tool_name}': {result}")
                     messages.append({"role": "tool", "tool_call_id": tool_id, "content": str(result)})
-                    # action_taken = True
                     break
 
                 else:
@@ -144,27 +169,11 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             self.store_send_data(llm_output=text)
 
         return messages
-
-
-
-
-    def _offers_interactions(self):
-        # TODO: move to BotBase - shared with NegotiationBot
-        log_function(__class__, sys._getframe().f_code.co_name)
-
-        # Create offer list, new offer not added yet
-        self.offer_list = OfferList(
-            Offer(**offer) for offer in self.player.offers)
-        # Create interactions list, add user message if needed
-        assert isinstance(self.player.llm_interactions, list)
-        self.interaction_list = InteractionList(self.player.llm_interactions)
-        self.interaction_list.add_user_message(self.user_message)
-        self.player.llm_interactions = self.interaction_list
     
     async def _dispatch(self, tool_name: str, arguments: dict) -> dict | None:
         log_function(__class__, sys._getframe().f_code.co_name)
 
-        # Dispatch table — maps tool names to handler methods
+        # dispatch table -> maps tool names to handler methods
         table = {
             "send_chat": self._handle_send_chat,
             "propose_offer": self._handle_propose_offer,
@@ -176,12 +185,16 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         }
 
         if tool_name not in table:
-            # Log hallucinated tool — this is research data, not just an error
+            # Log hallucinated tool
             self.add_debug_log(f"Unknown tool called by LLM: {tool_name}")
             self.store_send_data(llm_output="I need a moment to think.")
             return
 
         return await table[tool_name](arguments)
+
+    def _include_profitable_in_evaluation(self) -> bool:
+        # Use self.config, not player.session — async tasks detach the Player.
+        return self.config.get('agentic_evaluation_help', False)
 
     async def _handle_evaluate_offer(self, arguments: str) -> dict:
         log_function(__class__, sys._getframe().f_code.co_name)
@@ -195,8 +208,11 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             price = last_offer['price']
             quantity = last_offer['quantity']
 
-        return numeric_offer_evaluation(price, quantity, self.role,
-                                        self.constraint_user, self.constraint_bot)
+        return numeric_offer_evaluation(
+            price, quantity, self.role,
+            self.constraint_user, self.constraint_bot,
+            include_profitable=self._include_profitable_in_evaluation(),
+        )
     
     async def _handle_evaluate_single(self, arguments: str) -> dict:
         log_function(__class__, sys._getframe().f_code.co_name)
@@ -247,7 +263,9 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             
             evaluation = numeric_offer_evaluation(
                 price, quantity, self.role,
-                self.constraint_user, self.constraint_bot)
+                self.constraint_user, self.constraint_bot,
+                include_profitable=self._include_profitable_in_evaluation(),
+            )
             
             evaluations.append(evaluation)
 
@@ -268,7 +286,7 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             return
 
         self.offer_list.append(getattr(self, f'_pending_offer{offer_number}'))
-        self.store_send_data()
+        self.store_send_data(llm_output=message)
 
         for i in range(1,4):
             setattr(self, f'_pending_offer{i}', None)
@@ -281,6 +299,6 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         price = last_offer['price']
         quantity = last_offer['quantity']
 
-        # player, participant = self.get_player_participant()
-        # player.process_accept(price, quantity)
-        # self.send_asyncio_data({'finished': True})
+        player, participant = self.get_player_participant()
+        player.process_accept(price, quantity)
+        self.send_asyncio_data({'finished': True})

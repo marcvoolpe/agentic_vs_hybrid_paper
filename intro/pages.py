@@ -6,7 +6,7 @@ from typing import Any
 from otree.api import *
 from otree.database import db, AUTO_SUBMIT_DEFAULTS
 
-from agentic_vs_hybrid.common import employee_retailer_profit, employee_supplier_profit
+from common import employee_retailer_profit, employee_supplier_profit
 from .comprehension import get_employee_error_message, \
     EMPLOYEE_RETAILER_PROFIT, EMPLOYEE_SUPPLIER_PROFIT, MANAGER_QUESTIONS, \
     get_manager_error_message

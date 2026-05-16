@@ -65,6 +65,13 @@ class BotBase:
             return False
         raise NotImplementedError
 
+    @property
+    def proposal(self) -> str:
+        if not self.offer_list:
+            return '(none)<br> '
+        last_offer = self.offer_list[-1]
+        return f"â‚¬ {last_offer['price']}<br>{last_offer['quantity']}"
+
     def add_profits(self, offer: Offer):
         offer.profits(self.role, self.constraint_user, self.constraint_bot)
 

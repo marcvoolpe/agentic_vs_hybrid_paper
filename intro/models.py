@@ -5,8 +5,8 @@ from mimetypes import inited
 from otree.api import *
 from otree.database import LongStringField
 
-from agentic_vs_hybrid.common import JsonField, RoleUtils, ROOM_CONFIGS
-from agentic_vs_hybrid.settings import get_active_classes
+from common import JsonField, RoleUtils, ROOM_CONFIGS
+from settings import get_active_classes
 from .constants import C
 
 

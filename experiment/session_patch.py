@@ -65,10 +65,10 @@ class SessionPatch:
         llm_hosts = [llm_host for llm_host, enabled in self.config.items()
                      if llm_host.startswith(("http://", "https://")) and
                      enabled is True and self.test_host(llm_host)]
-        if not llm_hosts:
-            raise NoServersException("\n\nNo LLM hosts available!\n")
 
-        from agentic_vs_hybrid.experiment import log_debug
+        from .utils import log_debug
+        if not llm_hosts:
+            log_debug("No LLM hosts available")
         for llm_host in llm_hosts:
             log_debug(f"HOST {llm_host}")
 

@@ -14,8 +14,14 @@ __pycache__/
 secret.py
 settings.json
 **/functions.log
+**/debug.log
+experiment/static/experiment/debug/interpret.csv
 notebooks
 mock
-persona_scripts
+mock.ipynb
+experiment/persona_scripts/*.ipynb
+experiment/persona_scripts/PERSONA_OFFER_TABLES.md
+experiment/persona_scripts/verify_persona_offers.py
+analysis/verify_telemetry.py
 pixi.toml
 pixi.lock

@@ -1,5 +1,5 @@
 € per unit as your ceiling. You will not accept any deal that leaves you 
-below your minimum profit threshold.
+below your minimum profit threshold (target profit).
 
 Accepting an offer is irreversible and ends the negotiation immediately.
 Only accept when you are satisfied with the terms.
@@ -20,14 +20,16 @@ DECISION PROCEDURE — follow these steps in order every turn:
    - If profit_bot == -11: the offer is invalid. Call send_chat to explain 
      valid ranges, then call propose_offer with a valid counter.
    - If surplus >= 0: call accept_offer.
-   - If surplus < 0: propose_offer again with a higher price or adjusted quantity.
+   - If surplus < 0: call propose_offer again with a smaller price or adjusted quantity.
 3. If no offer was received, call propose_offer to open negotiation.
 
-NEVER call accept_offer if the most recent evaluate_offer result shows surplus < 0.
-NEVER call accept_offer if the most recent evaluate_offer result shows surplus < 0.
 NEVER call accept_offer if the most recent evaluate_offer result shows surplus < 0.
 
 NEVER skip evaluate_offer when an offer has been received.
 NEVER call propose_offer or accept_offer without first calling evaluate_offer.
 NEVER respond with plain text. You MUST always act by calling one of the
 available tools. Every response must be a tool call — no exceptions.
+Call exactly ONE tool per response. Never call multiple tools in the same
+response. If you need compute_nash and evaluate_offer (or any other
+sequence), call the first tool, wait for its result, then call the next
+tool on a later turn.

@@ -29,8 +29,11 @@ class Queues:
             LLM_HOSTS[key] = asyncio.Queue()
             cls.add_hosts(code, round_number)
 
+        if LLM_HOSTS[key].empty():
+            return None
+
         llm_host = None
-        end_time = time.time() + 90
+        end_time = time.time() + 15
         while time.time() <= end_time and llm_host is None:
             try:
                 llm_host = LLM_HOSTS[key].get_nowait()
@@ -64,13 +67,14 @@ class SessionPatch:
         self.debug_log = {i: [] for i in range(C.NUM_ROUNDS + 1)}
         llm_hosts = [llm_host for llm_host, enabled in self.config.items()
                      if llm_host.startswith(("http://", "https://")) and
-                     enabled is True and self.test_host(llm_host)]
+                     enabled is True]
 
         from .utils import log_debug
         if not llm_hosts:
-            log_debug("No LLM hosts available")
-        for llm_host in llm_hosts:
-            log_debug(f"HOST {llm_host}")
+            log_debug("No LLM hosts configured")
+        else:
+            for llm_host in llm_hosts:
+                log_debug(f"HOST {llm_host} (availability checked on use)")
 
         self.llm_hosts = llm_hosts
 
@@ -80,7 +84,7 @@ class SessionPatch:
 
         basic = HTTPBasicAuth(self.config['llm_user'], self.config['llm_pass'])
         try:
-            response = requests.get(llm_host, auth=basic, timeout=5)
+            response = requests.get(llm_host, auth=basic, timeout=2)
             available = response.ok and response.text == 'Ollama is running'
         except Exception as e:
             print()

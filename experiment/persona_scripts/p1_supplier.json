@@ -1,0 +1,57 @@
+{
+  "persona": "P1",
+  "bot_role": "supplier",
+  "human_role": "retailer",
+  "market_price": 12,
+  "production_cost": 3,
+  "turns": [
+    {
+      "turn": 1,
+      "price": 4.5,
+      "quantity": 94,
+      "message": "We'd like to start with €4.5 per unit for 94 units."
+    },
+    {
+      "turn": 2,
+      "price": 5.2,
+      "quantity": 93,
+      "message": "We can move to a higher price per unit €5.2 but, at that price we would order 93. We really need the quantity to be above 90 at this price point."
+    },
+    {
+      "turn": 3,
+      "price": 6.1,
+      "quantity": 91,
+      "message": "Come on we are on the same team. Let's keep the quantity above 90, we suggest 91 units at €6.1 per unit."
+    },
+    {
+      "turn": 4,
+      "price": 7.1,
+      "quantity": 87,
+      "message": "We're prepared to go down to 87 units only if we keep the price at a maximum of €7.1 per unit."
+    },
+    {
+      "turn": 5,
+      "price": 7.8,
+      "quantity": 74,
+      "message": "How about 74 units, we can't go any higher than €7.8 p.u. as I have another supplier's paperwork already on my desk with similar terms."
+    },
+    {
+      "turn": 6,
+      "price": 8.0,
+      "quantity": 66,
+      "message": "We value your excellence, as such we are able to stretch it to an absolute max of €8 p.u. for a min of 66, consider this a personal favor."
+    },
+    {
+      "turn": 7,
+      "price": 8.2,
+      "quantity": 61,
+      "message": "We are far beyond my signing authority, I just consulted with higher management and we need to order more than 60 units. As such, we will order 61 units at 8.2€ p.u."
+    },
+    {
+      "turn": 8,
+      "price": 8.5,
+      "quantity": 61,
+      "message": "Last offer, take it or leave it, we order a quantity of 61 at a price per unit of €8.50, the board wants a signature today."
+    }
+  ]
+}

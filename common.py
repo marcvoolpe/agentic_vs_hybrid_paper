@@ -133,7 +133,7 @@ CLASS_C = 'Class C'
 CLASS_DICT = {
     CLASS_A: {'market_price': 11, 'production_cost': 3,
               'transaction_costs': [25, 50], },
-    CLASS_B: {'market_price': 11, 'production_cost': 4,
+    CLASS_B: {'market_price': 12, 'production_cost': 3,
               'transaction_costs': [20, 40], },
     CLASS_C: {'market_price': 11, 'production_cost': 5,
               'transaction_costs': [15, 30], },
@@ -186,6 +186,12 @@ AGENT_ROOM_CONFIGS = {
     106: {'product_class': CLASS_B,
           'first': RC.ROLE_SUPPLIER_EMPLOYEE, 'baseline': True,
           'full_agent': False},
+    107: {'product_class': CLASS_B,
+          'first': RC.ROLE_RETAILER_EMPLOYEE, 'baseline': True,
+          'full_agent': True, 'agentic_evaluation_help': False},
+    108: {'product_class': CLASS_B,
+          'first': RC.ROLE_RETAILER_EMPLOYEE, 'baseline': True,
+          'full_agent': False},
 }
 
 ROOM_ID_ALIASES = {
@@ -195,6 +201,8 @@ ROOM_ID_ALIASES = {
     'agentic_supplier_help': 104,
     'hybrid_retailer': 105,
     'hybrid_supplier': 106,
+    'agentic_supplier_bot_no_help': 107,
+    'hybrid_supplier_bot': 108,
 }
 
 

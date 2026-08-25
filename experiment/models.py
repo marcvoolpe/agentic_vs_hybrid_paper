@@ -5,9 +5,8 @@ from typing import Any, Union
 
 from otree.api import *
 
-from common import JsonField, RoleUtils, employee_retailer_profit, \
-    employee_supplier_profit, ROOM_CONFIGS, AGENT_ROOM_CONFIGS, CLASS_DICT, \
-    get_room_config, normalize_room_id
+from common import JsonField, RoleUtils, ROOM_CONFIGS, AGENT_ROOM_CONFIGS, \
+    CLASS_DICT, get_room_config, normalize_room_id
 from settings import get_active_classes
 
 from .bot_negotiation import NegotiationBot
@@ -45,6 +44,15 @@ class Subsession(BaseSubsession):
 def creating_session(sub_session: Subsession):
     sub_session.session.initialize()
     sub_session.initialize_subsession()
+
+
+def before_next_round(sub_session: Subsession):
+    config = sub_session.session.config
+    for group in sub_session.get_groups():
+        group.initialize_group(config['demand_min'], config['demand_max'])
+        group.set_opponents()
+        for player in group.get_players():
+            player.participant.vars['first'] = True
 
 
 class Group(BaseGroup):
@@ -142,13 +150,19 @@ class Group(BaseGroup):
         offer = Offer(price=price, quantity=quantity)
         bot_role = (C.ROLE_SUPPLIER_EMPLOYEE if human_player.is_retailer
                     else C.ROLE_RETAILER_EMPLOYEE)
-        offer.profits(bot_role, self.market_price, self.production_cost)
+        from .telemetry import profit_constraints
+
+        constraint_user, constraint_bot = profit_constraints(
+            bot_role, self.market_price, self.production_cost,
+        )
+        offer.profits(bot_role, constraint_user, constraint_bot)
         self.target_profit = self.optimal_offer['profit']
         self.human_expected_profit = offer.profit_user
         self.bot_expected_profit = offer.profit_bot
 
     def set_payoff(self):
         player = self.get_player_by_id(1)
+        self.target_profit = self.optimal_offer['profit']
         price_accepted = player.field_maybe_none('price_accepted')
         quantity_accepted = player.field_maybe_none('quantity_accepted')
         if price_accepted is not None and quantity_accepted is not None:
@@ -183,6 +197,10 @@ class Player(BasePlayer, RoleUtils):
     time_start = models.StringField(max_length=20)
     time_end = models.StringField(max_length=20)
 
+    turn_counter = models.IntegerField(initial=0)
+    accepted_by = models.StringField(blank=True)
+    deal = models.BooleanField(initial=False)
+
     @cached_property
     def other(self) -> Union['Player', NegotiationBot, FullAgentBot]:
         if self.other_id == -1:
@@ -211,25 +229,39 @@ class Player(BasePlayer, RoleUtils):
     def live_ids(self) -> list[int]:
         return [idx for idx in [self.id_in_group, self.other_id] if idx > 0]
 
-    def process_offer(self, price: int, quantity: int) -> list[dict[str, int]]:
+    def process_offer(
+            self, price: int, quantity: int, body: str | None = None,
+    ) -> list[dict[str, int]]:
         log_function(__class__, sys._getframe().f_code.co_name)
 
         """ Offer made via the interface """
+        from .telemetry import current_turn, log_offer_event
+
         assert isinstance(self.offers, list)
         self.price_proposed = price
         self.quantity_proposed = quantity
 
         offer_user = Offer(idx=self.id_in_group, price=price, quantity=quantity)
+        log_offer_event(
+            self, offer_user, sender='human', origin='interface',
+            turn=current_turn(self),
+        )
         self.offers = self.offers + [offer_user]
+        if body:
+            assert isinstance(self.chat_data, list)
+            self.chat_data = self.chat_data + [
+                {'nick': f"{self.role} (Me)", 'body': body}]
         if not self.bot_opponent:
             self.other.offers = self.other.offers + [offer_user]
         else:
-            self.other.receive_offer_from_human(price, quantity)
+            self.other.receive_offer_from_human(price, quantity, body=body)
 
         return self.offers
 
-    def process_accept(self, price: int, quantity: int):
+    def process_accept(self, price: int, quantity: int, accepted_by: str = 'human'):
         log_function(__class__, sys._getframe().f_code.co_name)
+        from .telemetry import mark_accepted
+
         print(f"[DEBUG] process_accept: self={self.role}, price={price}, quantity={quantity}, bot_opponent={self.bot_opponent}")
 
         """ User accepts the opposing offer """
@@ -240,11 +272,13 @@ class Player(BasePlayer, RoleUtils):
             self.time_end = self.other.time_end = now_datetime()
             self.price_accepted = self.other.price_accepted = price
             self.quantity_accepted = self.other.quantity_accepted = quantity
+            mark_accepted(self, price, quantity, accepted_by)
             print(f"[DEBUG] process_accept (human): self={self.role}, price_accepted={self.price_accepted}, quantity_accepted={self.quantity_accepted}, other={self.other.role}, other_price_accepted={self.other.price_accepted}, other_quantity_accepted={self.other.quantity_accepted}")
         else:
             self.time_end = now_datetime()
             self.price_accepted = price
             self.quantity_accepted = quantity
+            mark_accepted(self, price, quantity, accepted_by)
             print(f"[DEBUG] process_accept (bot): self={self.role}, price_accepted={self.price_accepted}, quantity_accepted={self.quantity_accepted}")
 
     def process_chat(self, data: dict[str, Any]) -> dict[int, Any]:
@@ -322,19 +356,12 @@ class Player(BasePlayer, RoleUtils):
         price = float(self.price_accepted or 0)
         quantity = int(self.quantity_accepted or 0)
 
-        # Realized demand and parameters (common knowledge)
-        demand = int(self.group.demand or 0)
-        market_price = float(self.group.market_price)
-        production_cost = float(self.group.production_cost)
-
-        quantity_sold = min(quantity, demand)
-        quantity_unsold = max(0, quantity - demand)
+        market_price = int(self.group.market_price)
+        production_cost = int(self.group.production_cost)
 
         if self.role == C.ROLE_RETAILER_EMPLOYEE:
-            return employee_retailer_profit(market_price, price, quantity_sold)
-        else:
-            return employee_supplier_profit(price, production_cost,
-                                            quantity_sold, quantity_unsold)
+            return Offer.profit_retailer(price, quantity, market_price)
+        return Offer.profit_supplier(price, quantity, production_cost)
 
     def set_profit_payoff(self):
         print(f"[DEBUG] set_profit_payoff: role={self.role}, price_accepted={self.field_maybe_none('price_accepted')}, quantity_accepted={self.field_maybe_none('quantity_accepted')}")
@@ -346,3 +373,104 @@ class Player(BasePlayer, RoleUtils):
             self.profit = self.calculate_profits_employee()
             # employee earns 2% of deal profit
             self.payoff = Currency(max(self.profit, 0) * 0.02)
+
+
+class OfferEvent(ExtraModel):
+    player = models.Link(Player)
+    turn = models.IntegerField()
+    stamp = models.FloatField()
+    sender = models.StringField()
+    origin = models.StringField()
+    price = models.FloatField(null=True)
+    quantity = models.IntegerField(null=True)
+    is_valid = models.BooleanField()
+    is_complete = models.BooleanField()
+    profit_bot = models.FloatField(null=True)
+    profit_user = models.FloatField(null=True)
+    nash_profit = models.FloatField()
+    nash_price = models.FloatField()
+    nash_quantity = models.IntegerField()
+    surplus_bot = models.FloatField(null=True)
+    surplus_user = models.FloatField(null=True)
+    joint_profit = models.FloatField(null=True)
+    evaluation = models.StringField(blank=True)
+    bot_response = models.StringField(blank=True)
+    accepted = models.BooleanField(initial=False)
+    accepted_by = models.StringField(blank=True)
+    is_mirror = models.BooleanField(initial=False)
+    n_generations = models.IntegerField(initial=1)
+    session_code = models.StringField()
+    participant_code = models.StringField()
+    round_number = models.IntegerField()
+    room = models.IntegerField()
+    arm = models.StringField()
+    human_role = models.StringField()
+    bot_role = models.StringField()
+    market_price = models.IntegerField()
+    production_cost = models.IntegerField()
+    class_name = models.StringField()
+    agentic_evaluation_help = models.BooleanField(initial=False)
+    num_rounds = models.IntegerField()
+
+
+class DraftOffer(ExtraModel):
+    player = models.Link(Player)
+    turn = models.IntegerField()
+    step = models.IntegerField()
+    call_id = models.StringField()
+    slot = models.IntegerField()
+    price = models.FloatField(null=True)
+    quantity = models.IntegerField(null=True)
+    profit_bot = models.FloatField(null=True)
+    profit_user = models.FloatField(null=True)
+    nash_profit = models.FloatField()
+    nash_price = models.FloatField()
+    nash_quantity = models.IntegerField()
+    surplus_bot = models.FloatField(null=True)
+    surplus_user = models.FloatField(null=True)
+    joint_profit = models.FloatField(null=True)
+    price_dev_nash = models.FloatField(null=True)
+    quantity_dev_nash = models.IntegerField(null=True)
+    chosen = models.BooleanField(initial=False)
+    sent = models.BooleanField(initial=False)
+    session_code = models.StringField()
+    participant_code = models.StringField()
+    round_number = models.IntegerField()
+    room = models.IntegerField()
+    arm = models.StringField()
+    human_role = models.StringField()
+    bot_role = models.StringField()
+    market_price = models.IntegerField()
+    production_cost = models.IntegerField()
+    class_name = models.StringField()
+    agentic_evaluation_help = models.BooleanField(initial=False)
+    num_rounds = models.IntegerField()
+
+
+class LLMCall(ExtraModel):
+    player = models.Link(Player)
+    turn = models.IntegerField()
+    step = models.IntegerField()
+    trigger = models.StringField(blank=True)
+    provider = models.StringField(blank=True)
+    model = models.StringField(blank=True)
+    temperature = models.FloatField(null=True)
+    messages_sent = models.LongStringField(blank=True)
+    assistant_content = models.LongStringField(blank=True)
+    tool_name = models.StringField(blank=True)
+    tool_arguments = models.LongStringField(blank=True)
+    tool_result = models.LongStringField(blank=True)
+    no_tool_call = models.BooleanField(initial=False)
+    unknown_tool = models.BooleanField(initial=False)
+    session_code = models.StringField()
+    participant_code = models.StringField()
+    round_number = models.IntegerField()
+    room = models.IntegerField()
+    arm = models.StringField()
+    human_role = models.StringField()
+    bot_role = models.StringField()
+    market_price = models.IntegerField()
+    production_cost = models.IntegerField()
+    class_name = models.StringField()
+    agentic_evaluation_help = models.BooleanField(initial=False)
+    num_rounds = models.IntegerField()

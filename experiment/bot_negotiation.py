@@ -32,6 +32,8 @@ class NegotiationBot(BotStrategy, BotTask):
             'production_cost': player.group.production_cost,
             'market_price': player.group.market_price,
             'demand': player.group.demand,
+            'class_name': player.group.class_name,
+            'optimal_offer': player.group.optimal_offer,
 
             'bot_vars': player.bot_vars,
         })
@@ -68,16 +70,25 @@ class NegotiationBot(BotStrategy, BotTask):
         asyncio.ensure_future(self.start_task(self.follow_up))
 
 
-    def receive_offer_from_human(self, price: int, quantity: int):
+    def receive_offer_from_human(
+            self, price: int, quantity: int, body: str | None = None,
+    ):
         log_function(__class__, sys._getframe().f_code.co_name)
 
         # Received via the interface
-        self.user_message = HYBRID_PROMPTS['offer_string'] % (price, quantity)
+        message = HYBRID_PROMPTS['offer_string'] % (price, quantity)
+        if body:
+            message = f"{message}\n{body}"
+        self.user_message = message
         self._offers_interactions()
         asyncio.ensure_future(self.start_task(self.interface_offer))
 
     def _offers_interactions(self):
         log_function(__class__, sys._getframe().f_code.co_name)
+
+        from .telemetry import increment_bot_turn
+
+        self._current_turn = increment_bot_turn(self.player, config=self.config)
 
         # Create offer list, new offer not added yet
         self.offer_list = OfferList(

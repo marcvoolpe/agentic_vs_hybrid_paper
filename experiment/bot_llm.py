@@ -205,7 +205,10 @@ class BotLLM:
                 if provider == 'cerebras':
                     api_key = (getattr(secret, 'CEREBRAS_API_KEY', None) or '').strip()
                 else:
-                    api_key = (getattr(secret, 'OPEN_ROUTER_API_KEY', None) or '').strip()
+                    api_key = (
+                        (getattr(secret, 'OPEN_ROUTER_API_KEY', None) or '').strip()
+                        or (getattr(secret, 'KLAUS_OPEN_ROUTER_API_KEY', None) or '').strip()
+                    )
 
             if not api_key:
                 env_hint = (
@@ -302,7 +305,9 @@ class BotLLM:
             self._ensure_client()
             response = await self.client.chat(
                 model=self.config['llm_reader'],
-                messages=messages)
+                messages=messages,
+                options={'temperature': self.config['llm_temp']},
+            )
             llm_output = response['message']['content']
         else:
             # Otherwise, output an empty offer [,] directly

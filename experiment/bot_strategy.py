@@ -25,9 +25,17 @@ class BotStrategy(BotBase, BotLLM):
 
     async def follow_up(self):
         log_function(__class__, sys._getframe().f_code.co_name)
+        from .telemetry import log_offer_event
 
         # Extract possible offer, add to the list if valid
         self.offer_user = await self.interpret_offer(self.user_message)
+        if self.offer_user.is_complete:
+            log_offer_event(
+                self.player, self.offer_user,
+                sender='human', origin='chat_parsed',
+                turn=max(getattr(self, '_current_turn', 1) - 1, 0),
+                config=self.config,
+            )
         self.offer_list.append(self.offer_user)
         await self.evaluate()
 
@@ -42,6 +50,7 @@ class BotStrategy(BotBase, BotLLM):
 
     async def evaluate(self):
         log_function(__class__, sys._getframe().f_code.co_name)
+        from .telemetry import set_bot_response
 
         # Add profits for user and bot to the offers
         for offer in self.offer_list:
@@ -51,6 +60,18 @@ class BotStrategy(BotBase, BotLLM):
         evaluation = self.offer_user.evaluate(self.constraint_user,
                                               self.constraint_bot,
                                               self.bot_is_supplier)
+
+        turn = getattr(self, '_current_turn', 0)
+        if evaluation == Evaluation.ACCEPT:
+            set_bot_response(
+                self.player, turn, 'accept', evaluation=evaluation,
+                config=self.config,
+            )
+        else:
+            set_bot_response(
+                self.player, turn, 'counter_offer', evaluation=evaluation,
+                config=self.config,
+            )
 
         self.optimal_offer_str = optimal_solution_string(self.constraint_user,
                                                          self.constraint_bot,
@@ -82,6 +103,7 @@ class BotStrategy(BotBase, BotLLM):
 
     async def accept_final_chat(self):
         log_function(__class__, sys._getframe().f_code.co_name)
+        from .telemetry import log_offer_event
 
         await asyncio.sleep(4)
         # Create offer matching offer for user to accept
@@ -90,6 +112,13 @@ class BotStrategy(BotBase, BotLLM):
                           quantity=self.offer_user.quantity,
                           test="accept_final_chat")
         self.add_profits(bot_offer)
+        turn = getattr(self, '_current_turn', 0)
+        log_offer_event(
+            self.player, bot_offer,
+            sender='bot', origin='accept_mirror',
+            turn=turn, is_mirror=True, bot_response='accept',
+            config=self.config,
+        )
         self.offer_list.append(bot_offer)
         self.store_send_data()
 
@@ -99,7 +128,9 @@ class BotStrategy(BotBase, BotLLM):
         await asyncio.sleep(4)
         # Accept on the model
         player, participant = self.get_player_participant()
-        player.process_accept(self.offer_user.price, self.offer_user.quantity)
+        player.process_accept(
+            self.offer_user.price, self.offer_user.quantity, accepted_by='bot',
+        )
         # Accept in the interface
         self.send_asyncio_data({'finished': True})
 
@@ -161,7 +192,7 @@ class BotStrategy(BotBase, BotLLM):
                 log_debug(f"[DEBUG Bot_strategy.respond_to_offer] 5 - "
                           f"Not complete and respond_to_non_offer")
                 last_offer.profit_bot = last_offer.profit_user = 0
-                self.send_response(llm_output, last_offer)
+                self.send_response(llm_output, last_offer, n_generations=len(llm_offers))
                 return
             else:
                 # If the offer is not complete, set profits to 0 and continue
@@ -176,7 +207,7 @@ class BotStrategy(BotBase, BotLLM):
         if evaluation != Evaluation.ACCEPT:
             _, llm_output, last_offer = self.best_last_offer(llm_offers)
 
-        self.send_response(llm_output, last_offer)
+        self.send_response(llm_output, last_offer, n_generations=len(llm_offers))
 
     @staticmethod
     def best_last_offer(llm_offers: list[tuple[int, str, Offer]]) \
@@ -188,10 +219,23 @@ class BotStrategy(BotBase, BotLLM):
                                     if llm_offer[0] == max_profit])
         return best_offer
 
-    def send_response(self, llm_output: str, last_offer: Offer):
+    def send_response(self, llm_output: str, last_offer: Offer,
+                      n_generations: int = 1):
         log_function(__class__, sys._getframe().f_code.co_name)
+        from .telemetry import log_offer_event
 
+        turn = getattr(self, '_current_turn', 0)
         if last_offer is not None and last_offer.is_valid:
+            log_offer_event(
+                self.player, last_offer,
+                sender='bot', origin='chat_parsed',
+                turn=turn, bot_response='counter_offer',
+                n_generations=n_generations,
+                config=self.config,
+            )
             self.offer_list.append(last_offer)
+        elif llm_output is not None:
+            from .telemetry import set_bot_response
+            set_bot_response(self.player, turn, 'chat', config=self.config)
         if llm_output is not None:
             self.store_send_data(llm_output=llm_output)

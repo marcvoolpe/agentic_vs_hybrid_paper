@@ -8,13 +8,22 @@ from ollama import ChatResponse
 
 
 from .bot_base import BotBase, InteractionList
-from .bot_llm import BotLLM
+from .bot_llm import BotLLM, _normalize_llm_provider
 from .bot_task import BotTask
 from .prompts import HYBRID_PROMPTS, agent_system_final_prompts
 from .offer import Offer, OfferList
 from .optimal import nash_bargaining_solution
 from .utils import log_function
 from .bot_tools import numeric_offer_evaluation, TOOLS, ACTION_TOOLS
+from .telemetry import (
+    increment_bot_turn, log_drafts, log_offer_event, log_llm_call,
+    mark_chosen, set_bot_response,
+)
+
+KNOWN_TOOL_NAMES = {
+    'send_chat', 'propose_offer', 'send_offer', 'accept_offer',
+    'evaluate_offer', 'compute_nash', 'evaluate_single',
+}
 
 
 
@@ -30,6 +39,10 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         self._pending_offer1 = None
         self._pending_offer2 = None
         self._pending_offer3 = None
+        self._current_call_id = ''
+        self._propose_call_id = ''
+        self._current_step = 0
+        self._loop_trigger = 'chat'
 
         self.config = copy.deepcopy(player.session.config)
         self.config.update({
@@ -43,6 +56,8 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             'production_cost': player.group.production_cost,
             'market_price': player.group.market_price,
             'demand': player.group.demand,
+            'class_name': player.group.class_name,
+            'optimal_offer': player.group.optimal_offer,
 
             'bot_vars': player.bot_vars,
         })
@@ -53,18 +68,19 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             self.player.llm_interactions = []
             self._offers_interactions()
             asyncio.ensure_future(self.start_task(self._run_initial))
-            #asyncio use to call an async / await function
-            #always use when functions call external services (llm, browser etc)
-            #since it allows running the program (not freezing)
-            #while waiting for the external service response / answer
 
     def receive_chat_from_human(self, user_message:str):
         self.user_message = user_message
         self._offers_interactions()
         asyncio.ensure_future(self.start_task(self._run_chat))
 
-    def receive_offer_from_human(self, price: int, quantity: int):
-        self.user_message = HYBRID_PROMPTS['offer_string'] % (price, quantity)
+    def receive_offer_from_human(
+            self, price: int, quantity: int, body: str | None = None,
+    ):
+        message = HYBRID_PROMPTS['offer_string'] % (price, quantity)
+        if body:
+            message = f"{message}\n{body}"
+        self.user_message = message
         self._offers_interactions()
         asyncio.ensure_future(self.start_task(self._run_offer))
 
@@ -82,8 +98,9 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         task.add_done_callback(self.callback_handler)
 
     def _offers_interactions(self):
-        # TODO: move to BotBase - shared with NegotiationBot
         log_function(__class__, sys._getframe().f_code.co_name)
+
+        self._current_turn = increment_bot_turn(self.player, config=self.config)
 
         self.offer_list = OfferList(
             Offer(**offer) for offer in self.player.offers)
@@ -93,36 +110,93 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         self.interaction_list.add_user_message(self.user_message)
         self.player.llm_interactions = self.interaction_list
 
+    def _llm_provider_name(self) -> str:
+        provider = _normalize_llm_provider(self.config.get('llm_provider'))
+        return provider or 'openrouter'
+
+    def _last_human_offer(self) -> Offer | None:
+        for offer in reversed(self.offer_list):
+            if offer.idx != -1 and offer.is_complete:
+                return offer
+        return None
+
     async def _run_initial(self):
+        self._loop_trigger = 'initial'
         await self._run_loop("Start the negotiation with an opening message.")
 
     async def _run_chat(self):
+        self._loop_trigger = 'chat'
         await self._run_loop(self.user_message)
 
     async def _run_offer(self):
+        self._loop_trigger = 'offer'
         await self._run_loop(self.user_message)
 
     async def _run_loop(self, trigger: str, messages: list = None) -> list:
-        """Core tool-calling loop. trigger is 'initial', 'chat', or 'offer'.
-        Pass messages to continue an existing conversation; omit to start fresh.
-        Returns the updated messages list so callers can continue the conversation."""
+        """Core tool-calling loop."""
+        player, _ = self.get_player_participant()
         if messages is None:
             system_prompt = agent_system_final_prompts(self.config)
-            messages = [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": self.user_message or trigger},
-            ]
+            messages = [{"role": "system", "content": system_prompt}]
+            messages.extend(
+                {
+                    "role": "assistant" if m["role"] == "system" else "user",
+                    "content": m["content"],
+                }
+                for m in (self.interaction_list or [])
+            )
+            if not messages or messages[-1]["role"] != "user":
+                messages.append({
+                    "role": "user",
+                    "content": self.user_message or trigger,
+                })
         else:
             messages.append({"role": "user", "content": trigger})
         action_taken = False
 
         for step in range(7):
+            self._current_step = step
             print(f"  [loop step {step}] calling LLM...")
             response = await self.get_llm_response_with_tools(messages, TOOLS)
 
-            tool_calls = response.choices[0].message.tool_calls or []
+            raw_tool_calls = response.choices[0].message.tool_calls or []
+            assistant_content = response.choices[0].message.content or ''
+            tool_calls = [
+                {
+                    "id": tc.id,
+                    "type": getattr(tc, "type", None) or "function",
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments,
+                    },
+                }
+                for tc in raw_tool_calls
+            ]
+
+            if len(tool_calls) > 1:
+                dropped = ', '.join(
+                    tc["function"]["name"] for tc in tool_calls[1:])
+                print(f"  [loop step {step}] dropped parallel tool calls: {dropped}")
+                self.add_debug_log(f"Dropped parallel tool calls: {dropped}")
+                tool_calls = tool_calls[:1]
 
             if not tool_calls:
+                log_llm_call(
+                    player,
+                    config=self.config,
+                    turn=self._current_turn,
+                    step=step,
+                    trigger=self._loop_trigger,
+                    provider=self._llm_provider_name(),
+                    model=self.config.get('llm_model', ''),
+                    temperature=self.config.get('llm_temp'),
+                    messages_sent=messages,
+                    assistant_content=assistant_content,
+                    tool_name='',
+                    tool_arguments={},
+                    tool_result='',
+                    no_tool_call=True,
+                )
                 messages.append({
                     "role": "user",
                     "content": "You must respond by calling a tool. Plain text is not allowed."
@@ -131,34 +205,49 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
 
             assistant_message = {
                 "role": "assistant",
-                "content": response.choices[0].message.content,
-                "tool_calls": response.choices[0].message.tool_calls
+                "content": assistant_content,
+                "tool_calls": tool_calls,
             }
             messages.append(assistant_message)
 
-            for obj_tool_call in tool_calls:
+            for tool_call in tool_calls:
+                tool_id = tool_call["id"]
+                tool_name = tool_call["function"]["name"]
+                arguments = tool_call["function"]["arguments"]
+                self._current_call_id = tool_id
 
-                tool_call = {
-                    'id': obj_tool_call.id,
-                    'name': obj_tool_call.function.name,
-                    'arguments': obj_tool_call.function.arguments
-                }
-
-                tool_id = tool_call['id']
-                tool_name = tool_call['name']
-                arguments = tool_call['arguments']
+                try:
+                    parsed_args = json.loads(arguments) if isinstance(arguments, str) else arguments
+                except json.JSONDecodeError:
+                    parsed_args = {}
 
                 result = await self._dispatch(tool_name, arguments)
+
+                log_llm_call(
+                    player,
+                    config=self.config,
+                    turn=self._current_turn,
+                    step=step,
+                    trigger=self._loop_trigger,
+                    provider=self._llm_provider_name(),
+                    model=self.config.get('llm_model', ''),
+                    temperature=self.config.get('llm_temp'),
+                    messages_sent=messages[:-1],
+                    assistant_content=assistant_content,
+                    tool_name=tool_name,
+                    tool_arguments=parsed_args,
+                    tool_result=str(result) if result is not None else '',
+                    unknown_tool=tool_name not in KNOWN_TOOL_NAMES,
+                )
 
                 if tool_name not in ACTION_TOOLS:
                     print(f"  [loop step {step}] tool result for '{tool_name}': {result}")
                     messages.append({"role": "tool", "tool_call_id": tool_id, "content": str(result)})
                     break
 
-                else:
-                    print(f"  [loop step {step}] action tool '{tool_name}' called — loop break")
-                    action_taken = True
-                    break
+                print(f"  [loop step {step}] action tool '{tool_name}' called — loop break")
+                action_taken = True
+                break
 
             if action_taken:
                 break
@@ -166,14 +255,14 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         if not action_taken:
             text = 'I need a moment to think'
             print(f"  [loop] max steps reached without action — fallback")
+            set_bot_response(player, self._current_turn, 'fallback', config=self.config)
             self.store_send_data(llm_output=text)
 
         return messages
-    
-    async def _dispatch(self, tool_name: str, arguments: dict) -> dict | None:
+
+    async def _dispatch(self, tool_name: str, arguments: str) -> dict | None:
         log_function(__class__, sys._getframe().f_code.co_name)
 
-        # dispatch table -> maps tool names to handler methods
         table = {
             "send_chat": self._handle_send_chat,
             "propose_offer": self._handle_propose_offer,
@@ -185,7 +274,6 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         }
 
         if tool_name not in table:
-            # Log hallucinated tool
             self.add_debug_log(f"Unknown tool called by LLM: {tool_name}")
             self.store_send_data(llm_output="I need a moment to think.")
             return
@@ -193,12 +281,11 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         return await table[tool_name](arguments)
 
     def _include_profitable_in_evaluation(self) -> bool:
-        # Use self.config, not player.session — async tasks detach the Player.
         return self.config.get('agentic_evaluation_help', False)
 
     async def _handle_evaluate_offer(self, arguments: str) -> dict:
         log_function(__class__, sys._getframe().f_code.co_name)
-        arguments = json.loads(arguments) # arguments are json string -> convert to dict
+        arguments = json.loads(arguments)
 
         price = arguments.get('price')
         quantity = arguments.get('quantity')
@@ -208,12 +295,15 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
             price = last_offer['price']
             quantity = last_offer['quantity']
 
-        return numeric_offer_evaluation(
+        result = numeric_offer_evaluation(
             price, quantity, self.role,
             self.constraint_user, self.constraint_bot,
             include_profitable=self._include_profitable_in_evaluation(),
         )
-    
+        player, _ = self.get_player_participant()
+        set_bot_response(player, self._current_turn, 'evaluate', config=self.config)
+        return result
+
     async def _handle_evaluate_single(self, arguments: str) -> dict:
         log_function(__class__, sys._getframe().f_code.co_name)
         arguments = json.loads(arguments)
@@ -222,7 +312,6 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         quantity = arguments.get('quantity')
         offer = Offer(price=price, quantity=quantity)
 
-        # TODO: refactor from offer.py
         params = {
             'bot_is_supplier': self.bot_is_supplier,
             'nash_profit': nash_bargaining_solution(
@@ -233,44 +322,60 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
 
         if price is None:
             return {f'Is quantity {quantity} feasible?': offer._is_quantity_feasible(params=params)}
-        else: 
-            return {f'Is price {price} feasible?': offer._is_price_feasible(params=params)}
-    
-    async def _handle_compute_nash(self, arguments: str) -> dict: # arguments is always empty here
-        log_function(__class__, sys._getframe().f_code.co_name)
+        return {f'Is price {price} feasible?': offer._is_price_feasible(params=params)}
 
+    async def _handle_compute_nash(self, arguments: str) -> dict:
+        log_function(__class__, sys._getframe().f_code.co_name)
         return nash_bargaining_solution(self.constraint_user, self.constraint_bot)
-    
+
     async def _handle_send_chat(self, arguments: str) -> None:
         log_function(__class__, sys._getframe().f_code.co_name)
         arguments = json.loads(arguments)
 
         message = arguments.get('message')
+        player, _ = self.get_player_participant()
+        set_bot_response(player, self._current_turn, 'chat', config=self.config)
         self.store_send_data(llm_output=message)
 
     async def _handle_propose_offer(self, arguments: str) -> dict:
-        """Draft an offer and evaluate it. Does NOT send to the interface."""
+        """Draft three offers and evaluate them. Does NOT send to the interface."""
         log_function(__class__, sys._getframe().f_code.co_name)
         arguments = json.loads(arguments)
 
+        pending_offers = []
         evaluations = []
 
-        for i in range(1,4):
+        for i in range(1, 4):
             price = arguments.get(f'price_{i}')
             quantity = arguments.get(f'quantity_{i}')
             pending_offer = Offer(price=price, quantity=quantity)
             setattr(self, f'_pending_offer{i}', pending_offer)
-            
+            pending_offers.append(pending_offer)
+
             evaluation = numeric_offer_evaluation(
                 price, quantity, self.role,
                 self.constraint_user, self.constraint_bot,
                 include_profitable=self._include_profitable_in_evaluation(),
             )
-            
             evaluations.append(evaluation)
 
-        output = "\n".join(f'Proposed Offer {i+1} evaluation: {evaluations[i]}' for i in range(3))
+        player, _ = self.get_player_participant()
+        self._propose_call_id = self._current_call_id
+        log_drafts(
+            player,
+            self._propose_call_id,
+            self._current_turn,
+            self._current_step,
+            pending_offers,
+            evaluations,
+            bot_role=self.role,
+            config=self.config,
+        )
 
+        output = "\n".join(
+            f'Proposed Offer {i + 1} evaluation: {evaluations[i]}'
+            for i in range(3)
+        )
         return output
 
     async def _handle_send_offer(self, arguments: str) -> None:
@@ -280,25 +385,48 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
 
         offer_number = arguments.get('offer_number')
         message = arguments.get('message')
+        player, _ = self.get_player_participant()
 
-        if getattr(self, f'_pending_offer{offer_number}') is None:
+        pending = getattr(self, f'_pending_offer{offer_number}', None)
+        if pending is None:
+            mark_chosen(player, self._propose_call_id, offer_number, sent=False,
+                        config=self.config)
             self.store_send_data(llm_output="I need a moment to think.")
             return
 
-        self.offer_list.append(getattr(self, f'_pending_offer{offer_number}'))
+        self.add_profits(pending)
+        mark_chosen(player, self._propose_call_id, offer_number, sent=True,
+                    config=self.config)
+        log_offer_event(
+            player, pending,
+            sender='bot', origin='tool',
+            turn=self._current_turn, bot_response='counter_offer',
+            bot_role=self.role,
+            config=self.config,
+        )
+        self.offer_list.append(pending)
+        set_bot_response(player, self._current_turn, 'counter_offer', config=self.config)
         self.store_send_data(llm_output=message)
 
-        for i in range(1,4):
+        for i in range(1, 4):
             setattr(self, f'_pending_offer{i}', None)
 
     async def _handle_accept_offer(self, arguments: str) -> None:
         log_function(__class__, sys._getframe().f_code.co_name)
-        arguments = json.loads(arguments)
+        if arguments:
+            json.loads(arguments)
 
-        last_offer = self.offer_list[-1]
-        price = last_offer['price']
-        quantity = last_offer['quantity']
+        human_offer = self._last_human_offer()
+        if human_offer is None:
+            await self._handle_send_chat(json.dumps({
+                'message': "I didn't receive a complete offer to accept yet."
+            }))
+            return
+
+        price = human_offer.price
+        quantity = human_offer.quantity
 
         player, participant = self.get_player_participant()
-        player.process_accept(price, quantity)
+        player.process_accept(price, quantity, accepted_by='bot')
+        set_bot_response(player, self._current_turn, 'accept', config=self.config)
         self.send_asyncio_data({'finished': True})

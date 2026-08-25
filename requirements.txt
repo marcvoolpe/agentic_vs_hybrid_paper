@@ -209,6 +209,7 @@ numpy==1.26.4 ; sys_platform == 'win32'
     #   blis
     #   contourpy
     #   matplotlib
+    #   pandas
     #   scipy
     #   spacy
     #   thinc
@@ -228,6 +229,8 @@ packaging==25.0 ; sys_platform == 'win32'
     #   spacy
     #   thinc
     #   weasel
+pandas==2.2.3 ; sys_platform == 'win32'
+    # via agentic-vs-hybrid-paper
 parso==0.8.5 ; sys_platform == 'win32'
     # via
     #   agentic-vs-hybrid-paper
@@ -296,10 +299,13 @@ python-dateutil==2.9.0.post0 ; sys_platform == 'win32'
     #   agentic-vs-hybrid-paper
     #   jupyter-client
     #   matplotlib
+    #   pandas
 python-multipart==0.0.5 ; sys_platform == 'win32'
     # via
     #   agentic-vs-hybrid-paper
     #   otree
+pytz==2026.3.post1 ; sys_platform == 'win32'
+    # via pandas
 pywin32==311 ; sys_platform == 'win32'
     # via
     #   agentic-vs-hybrid-paper
@@ -400,7 +406,9 @@ typing-inspection==0.4.1 ; sys_platform == 'win32'
     #   agentic-vs-hybrid-paper
     #   pydantic
 tzdata==2025.2 ; sys_platform == 'win32'
-    # via agentic-vs-hybrid-paper
+    # via
+    #   agentic-vs-hybrid-paper
+    #   pandas
 umf==1.0.3 ; sys_platform == 'win32'
     # via
     #   agentic-vs-hybrid-paper

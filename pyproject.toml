@@ -99,6 +99,8 @@ dependencies = [
     "otree==5.11.4 ; sys_platform == 'win32'",
     "packaging==25.0",
     "packaging==25.0 ; sys_platform == 'win32'",
+    "pandas==2.2.3",
+    "pandas==2.2.3 ; sys_platform == 'win32'",
     "parso==0.8.5",
     "parso==0.8.5 ; sys_platform == 'win32'",
     "pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'",

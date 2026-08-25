@@ -62,6 +62,7 @@ dependencies = [
     { name = "onemkl-license", marker = "sys_platform == 'win32'" },
     { name = "otree", marker = "sys_platform == 'win32'" },
     { name = "packaging", marker = "sys_platform == 'win32'" },
+    { name = "pandas", marker = "sys_platform == 'win32'" },
     { name = "parso", marker = "sys_platform == 'win32'" },
     { name = "pillow", marker = "sys_platform == 'win32'" },
     { name = "platformdirs", marker = "sys_platform == 'win32'" },
@@ -205,6 +206,8 @@ requires-dist = [
     { name = "otree", marker = "sys_platform == 'win32'", specifier = "==5.11.4" },
     { name = "packaging", specifier = "==25.0" },
     { name = "packaging", marker = "sys_platform == 'win32'", specifier = "==25.0" },
+    { name = "pandas", specifier = "==2.2.3" },
+    { name = "pandas", marker = "sys_platform == 'win32'", specifier = "==2.2.3" },
     { name = "parso", specifier = "==0.8.5" },
     { name = "parso", marker = "sys_platform == 'win32'", specifier = "==0.8.5" },
     { name = "pexpect", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'", specifier = "==4.9.0" },
@@ -924,6 +927,21 @@ wheels = [
 ]
 
 [[package]]
+name = "pandas"
+version = "2.2.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", marker = "sys_platform == 'win32'" },
+    { name = "python-dateutil", marker = "sys_platform == 'win32'" },
+    { name = "pytz", marker = "sys_platform == 'win32'" },
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9c/d6/9f8431bacc2e19dca897724cd097b1bb224a6ad5433784a44b587c7c13af/pandas-2.2.3.tar.gz", hash = "sha256:4f18ba62b61d7e192368b84517265a99b4d7ee8912f8708660fb4a366cc82667", size = 4399213, upload-time = "2024-09-20T13:10:04.827Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/d4/1244ab8edf173a10fd601f7e13b9566c1b525c4f365d6bee918e68381889/pandas-2.2.3-cp312-cp312-win_amd64.whl", hash = "sha256:59ef3764d0fe818125a5097d2ae867ca3fa64df032331b7e0917cf5d7bf66b13", size = 11504248, upload-time = "2024-09-20T13:09:23.137Z" },
+]
+
+[[package]]
 name = "parso"
 version = "0.8.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1105,6 +1123,15 @@ dependencies = [
     { name = "six", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/46/40/a933ac570bf7aad12a298fc53458115cc74053474a72fbb8201d7dc06d3d/python-multipart-0.0.5.tar.gz", hash = "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43", size = 32581, upload-time = "2018-10-12T08:36:41.595Z" }
+
+[[package]]
+name = "pytz"
+version = "2026.3.post1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/48/fb042503b6ca6cd271261dc559fd6432f7d8c713153e9ec5c591af4dfc1c/pytz-2026.3.post1.tar.gz", hash = "sha256:2211d3fcf9a797d3405cac96ac7f61d80e6a644f72a3309607282fe8a2010c5d", size = 319745, upload-time = "2026-07-25T15:12:07.385Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/7b/39c34ca613b0b198cb866466651b26b045e2009864c5183c979a3b83f383/pytz-2026.3.post1-py2.py3-none-any.whl", hash = "sha256:dd95840dd199baea12d9cc096a1d452caa6596a1c1e4b5f3dbd1541855d5e815", size = 508283, upload-time = "2026-07-25T15:12:05.782Z" },
+]
 
 [[package]]
 name = "pywin32"

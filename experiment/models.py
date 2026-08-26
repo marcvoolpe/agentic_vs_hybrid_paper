@@ -462,6 +462,7 @@ class LLMCall(ExtraModel):
     tool_result = models.LongStringField(blank=True)
     no_tool_call = models.BooleanField(initial=False)
     unknown_tool = models.BooleanField(initial=False)
+    error = models.LongStringField(blank=True, initial='')
     session_code = models.StringField()
     participant_code = models.StringField()
     round_number = models.IntegerField()

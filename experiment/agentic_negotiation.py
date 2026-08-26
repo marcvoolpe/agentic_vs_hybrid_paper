@@ -15,6 +15,7 @@ from .offer import Offer, OfferList
 from .optimal import nash_bargaining_solution
 from .utils import log_function
 from .bot_tools import numeric_offer_evaluation, TOOLS, ACTION_TOOLS
+from .open_router import LLMTransportError
 from .telemetry import (
     increment_bot_turn, log_drafts, log_offer_event, log_llm_call,
     mark_chosen, set_bot_response,
@@ -157,7 +158,30 @@ class FullAgentBot(BotBase, BotLLM, BotTask):
         for step in range(7):
             self._current_step = step
             print(f"  [loop step {step}] calling LLM...")
-            response = await self.get_llm_response_with_tools(messages, TOOLS)
+            try:
+                response = await self.get_llm_response_with_tools(messages, TOOLS)
+            except LLMTransportError as exc:
+                msg = f'LLM transport error after retries — abandoning round: {exc!r}'
+                print(f"  [loop step {step}] {msg}")
+                self.add_debug_log(msg)
+                log_llm_call(
+                    player,
+                    config=self.config,
+                    turn=self._current_turn,
+                    step=step,
+                    trigger=self._loop_trigger,
+                    provider=self._llm_provider_name(),
+                    model=self.config.get('llm_model', ''),
+                    temperature=self.config.get('llm_temp'),
+                    messages_sent=messages,
+                    assistant_content='',
+                    tool_name='',
+                    tool_arguments={},
+                    tool_result='',
+                    error=repr(exc),
+                )
+                self.send_asyncio_data({'finished': True})
+                return messages
 
             raw_tool_calls = response.choices[0].message.tool_calls or []
             assistant_content = response.choices[0].message.content or ''
